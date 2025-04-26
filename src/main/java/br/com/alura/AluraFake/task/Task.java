@@ -26,4 +26,8 @@ public class Task {
 
     @Deprecated
     public Task() {}
+
+    public String getStatement() {
+        return this.statement;
+    }
 }
