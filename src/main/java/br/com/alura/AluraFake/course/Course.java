@@ -63,4 +63,8 @@ public class Course {
     public LocalDateTime getPublishedAt() {
         return publishedAt;
     }
+
+    public boolean isBuilding() {
+        return Status.BUILDING == this.status;
+    }
 }
