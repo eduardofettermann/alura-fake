@@ -35,22 +35,22 @@ class TaskRepositoryTest {
                 "Aprofunde-se em boas práticas de POO com Alura",
                 user
         );
-        String firstExpectedStatement = "Por que não devemos abreviar nomes de variáveis?";
-        String secondExpectedStatement = "Qual desses métodos segue a convenção 'Don’t Abbreviate'?";
-        Task firstTask = new Task(course, OPEN_TEXT, 1, firstExpectedStatement);
-        Task secondTask = new Task(course, SINGLE_CHOICE, 2, secondExpectedStatement);
+        String lastExpectedStatement = "Por que não devemos abreviar nomes de variáveis?";
+        String firstExpectedStatement = "Qual desses métodos segue a convenção 'Don’t Abbreviate'?";
+        Task lastExpectedTask = new Task(course, OPEN_TEXT, 2, lastExpectedStatement);
+        Task firstExpectedTask = new Task(course, SINGLE_CHOICE, 1, firstExpectedStatement);
+        List<Task> expectedTasksList = List.of(firstExpectedTask, lastExpectedTask);
 
         userRepository.save(user);
         courseRepository.save(course);
-        taskRepository.save(firstTask);
-        taskRepository.save(secondTask);
-        List<Task> foundTasks = taskRepository.findAllByCourseId(course.getId());
+        taskRepository.save(lastExpectedTask);
+        taskRepository.save(firstExpectedTask);
+        List<Task> foundTasks = taskRepository.findTasksByCourseIdOrderByOrderItemAsc(course.getId());
 
         assertThat(foundTasks.size()).isEqualTo(2);
-        assertThat(foundTasks.get(0).getStatement()).isEqualTo(firstExpectedStatement);
-        assertThat(foundTasks.get(1).getStatement()).isEqualTo(secondExpectedStatement);
+        assertThat(foundTasks).isEqualTo(expectedTasksList);
 
-        foundTasks = taskRepository.findAllByCourseId(2L);
+        foundTasks = taskRepository.findTasksByCourseIdOrderByOrderItemAsc(2L);
         assertThat(foundTasks.size()).isEqualTo(0);
     }
 }
