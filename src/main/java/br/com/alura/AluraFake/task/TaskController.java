@@ -81,7 +81,7 @@ public class TaskController {
         }
 
         Integer higherTaskOrder = taskRepository.findMaxOrderByCourseId(newTaskDTO.getCourseId());
-        Integer nextOrderSequence = higherTaskOrder + 1;
+        int nextOrderSequence = higherTaskOrder + 1;
         boolean isIncorrectSequence = newTaskDTO.getOrder() > nextOrderSequence;
 
         if (isIncorrectSequence) {
