@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,20 +25,22 @@ public class TaskController {
     }
 
     @PostMapping("/task/new/opentext")
+    @Transactional
     public ResponseEntity newOpenTextExercise(@RequestBody @Valid NewTaskDTO newTaskDTO) {
-        Optional<ResponseEntity<ErrorItemDTO>> taskErrorItemDTOResponse = validateTask(newTaskDTO);
-        if (taskErrorItemDTOResponse.isPresent()) {
-            return taskErrorItemDTOResponse.get();
-        }
-
         Optional<Course> possibleCourse = courseRepository.findById(newTaskDTO.getCourseId());
-
         Optional<ResponseEntity<ErrorItemDTO>> courseErrorItemDTOResponse = validateCourseByCourseId(
                 possibleCourse,
                 newTaskDTO.getCourseId()
         );
+
         if (courseErrorItemDTOResponse.isPresent()) {
             return courseErrorItemDTOResponse.get();
+        }
+
+        Optional<ResponseEntity<ErrorItemDTO>> taskErrorItemDTOResponse = validateTask(newTaskDTO);
+
+        if (taskErrorItemDTOResponse.isPresent()) {
+            return taskErrorItemDTOResponse.get();
         }
 
         Task task = new Task(possibleCourse.get(), Type.OPEN_TEXT, newTaskDTO.getOrder(), newTaskDTO.getStatement());
@@ -65,6 +68,7 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
+    @Transactional
     public Optional<ResponseEntity<ErrorItemDTO>> validateTask(NewTaskDTO newTaskDTO) {
         boolean existsWithTheSameCourseIdAndStatement = taskRepository.existsTasksByCourseIdAndByStatement(
                 newTaskDTO.getCourseId(),
@@ -87,6 +91,21 @@ public class TaskController {
         if (isIncorrectSequence) {
             return Optional.of(ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorItemDTO("order", "A ordem inserida está fora de sequência")));
+        }
+
+        boolean shouldReorder = taskRepository.existsTasksByCourseIdAndByOrder(
+                newTaskDTO.getCourseId(),
+                newTaskDTO.getOrder()
+        );
+
+        if (shouldReorder) {
+            List<Task> tasksToReorder = taskRepository.findByCourseIdAndOrderGreaterThanEqualForUpdate(
+                    newTaskDTO.getCourseId(), newTaskDTO.getOrder()
+            );
+
+            tasksToReorder.forEach(task -> task.setOrder(task.getOrder() + 1));
+
+            taskRepository.saveAll(tasksToReorder);
         }
 
         return Optional.empty();
