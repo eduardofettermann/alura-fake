@@ -80,9 +80,11 @@ public class TaskController {
                     .body(new ErrorItemDTO("statement", message)));
         }
 
-        boolean isCorrectSequence = newTaskDTO.getCourseId() > taskRepository.findMaxOrderByCourseId(newTaskDTO.getCourseId());
+        Integer higherTaskOrder = taskRepository.findMaxOrderByCourseId(newTaskDTO.getCourseId());
+        Integer nextOrderSequence = higherTaskOrder + 1;
+        boolean isIncorrectSequence = newTaskDTO.getOrder() > nextOrderSequence;
 
-        if (!isCorrectSequence) {
+        if (isIncorrectSequence) {
             return Optional.of(ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorItemDTO("order", "A ordem inserida está fora de sequência")));
         }
