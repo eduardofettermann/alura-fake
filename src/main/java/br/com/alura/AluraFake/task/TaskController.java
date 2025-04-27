@@ -80,19 +80,22 @@ public class TaskController {
 
     private Optional<ResponseEntity<ErrorItemDTO>> validateOrder(NewTaskDTO newTaskDTO) {
         Integer highestOrder = taskRepository.findHighestOrderByCourseId(newTaskDTO.getCourseId());
-        if (highestOrder == null) {
-            return Optional.empty();
-        }
 
-        int expectedNextOrder = highestOrder + 1;
-        int newOrder = newTaskDTO.getOrder();
-
-        if (newOrder > expectedNextOrder) {
+        if (highestOrder == null && newTaskDTO.getOrder() != 1) {
             return Optional.of(buildErrorResponse("order", "A ordem inserida está fora de sequência", HttpStatus.BAD_REQUEST));
         }
 
-        if (taskRepository.existsTasksByCourseIdAndByOrder(newTaskDTO.getCourseId(), newOrder)) {
-            reorderTasks(newTaskDTO);
+        if (highestOrder != null) {
+            int expectedNextOrder = highestOrder + 1;
+            int newOrder = newTaskDTO.getOrder();
+
+            if (newOrder > expectedNextOrder) {
+                return Optional.of(buildErrorResponse("order", "A ordem inserida está fora de sequência", HttpStatus.BAD_REQUEST));
+            }
+
+            if (taskRepository.existsTasksByCourseIdAndByOrder(newTaskDTO.getCourseId(), newOrder)) {
+                reorderTasks(newTaskDTO);
+            }
         }
 
         return Optional.empty();
