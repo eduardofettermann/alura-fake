@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -150,6 +151,52 @@ public class TaskControllerTest {
                .andExpect(jsonPath("$.message")
                        .isNotEmpty());
    }
+
+    @Test
+    void newTask__should_reorder_tasks_and_return_created_when_order_is_smaller_than_greater_order() throws Exception {
+        Course course = mock(Course.class);
+        NewTaskDTO newTaskDTO = new NewTaskDTO();
+        newTaskDTO.setCourseId(course.getId());
+        newTaskDTO.setStatement("Explique o que é KISS e as vantagens de sua utilização.");
+        newTaskDTO.setType(Type.OPEN_TEXT);
+        newTaskDTO.setOrder(2);
+        Task mockitoTask = new Task(
+                course,
+                Type.OPEN_TEXT,
+                2,
+                "Qual framework é amplamente utilizado para mockar dados no Java?"
+        );
+        Task springBootTask = new Task(
+                course,
+                Type.SINGLE_CHOICE,
+                3,
+                "Qual desses frameworks serve para auxiliar na criação de REST APIs?");
+        List<Task> tasks = List.of(mockitoTask, springBootTask);
+
+        doReturn(Optional.of(course)).when(courseRepository).findById(newTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+        when(taskRepository.existsTasksByCourseIdAndByStatement(
+                newTaskDTO.getCourseId(),
+                newTaskDTO.getStatement()
+        )).thenReturn(false);
+        doReturn(2).when(taskRepository).findMaxOrderByCourseId(newTaskDTO.getCourseId());
+        when(taskRepository.existsTasksByCourseIdAndByOrder(
+                newTaskDTO.getCourseId(),
+                newTaskDTO.getOrder())
+        ).thenReturn(true);
+
+        when(taskRepository.findByCourseIdAndOrderGreaterThanEqualForUpdate(
+                newTaskDTO.getCourseId(),
+                newTaskDTO.getOrder()
+        )).thenReturn(tasks);
+
+        mockMvc.perform(post("/task/new/opentext")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newTaskDTO)))
+                .andExpect(status().isCreated());
+
+        verify(taskRepository, times(1)).save(any(Task.class));
+    }
 
     @Test
     void newTask__should_return_created_when_new_task_request_is_valid() throws Exception {
