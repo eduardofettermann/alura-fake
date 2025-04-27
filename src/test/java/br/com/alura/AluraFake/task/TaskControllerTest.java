@@ -10,9 +10,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,8 +39,8 @@ public class TaskControllerTest {
         newTaskDTO.setType(Type.OPEN_TEXT);
 
         mockMvc.perform(post("/task/new/opentext")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newTaskDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0].field")
                         .value("statement"))
@@ -56,8 +58,8 @@ public class TaskControllerTest {
         newTaskDTO.setType(Type.OPEN_TEXT);
 
         mockMvc.perform(post("/task/new/opentext")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newTaskDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0].field")
                         .value("statement"))
@@ -96,8 +98,8 @@ public class TaskControllerTest {
         newTaskDTO.setStatement("Aprenda a criar uma aplicação com autenticação utilizando Spring Security com Alura");
 
         mockMvc.perform(post("/task/new/opentext")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newTaskDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0].field")
                         .value("order"))
@@ -117,8 +119,8 @@ public class TaskControllerTest {
         doReturn(Optional.of(course)).when(courseRepository).findById(newTaskDTO.getCourseId());
 
         mockMvc.perform(post("/task/new/opentext")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newTaskDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.field")
                         .value("courseId"))
@@ -144,5 +146,24 @@ public class TaskControllerTest {
                 .andExpect(status().isCreated());
 
         verify(taskRepository, times(1)).save(any(Task.class));
+    }
+
+    @Test
+    void listAllTasks__should_list_all_tasks() throws Exception {
+        Course course = mock(Course.class);
+        Task kissTask = new Task(course, Type.OPEN_TEXT, 1, "Explique o que é KISS e as vantagens de sua utilização.");
+        Task yagniTask = new Task(course, Type.OPEN_TEXT, 2, "Explique o que é YAGNI e as vantagens da sua utilização.");
+        Task dryTask = new Task(course, Type.OPEN_TEXT, 3, "Explique o que é DRY e as vantagens da sua utilização.");
+
+        doReturn(true).when(course).isBuilding();
+
+        when(taskRepository.findAll()).thenReturn(Arrays.asList(yagniTask, kissTask, dryTask));
+
+        mockMvc.perform(get("/task/all")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].statement").value(yagniTask.getStatement()))
+                .andExpect(jsonPath("$[1].statement").value(kissTask.getStatement()))
+                .andExpect(jsonPath("$[2].statement").value(dryTask.getStatement()));
     }
 }
