@@ -35,6 +35,10 @@ public class Task {
         return order;
     }
 
+    public void setOrder(Integer order) {
+        this.order = order;
+    }
+
     public String getStatement() {
         return statement;
     }
