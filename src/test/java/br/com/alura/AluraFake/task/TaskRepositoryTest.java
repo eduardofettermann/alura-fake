@@ -53,4 +53,30 @@ class TaskRepositoryTest {
         foundTasks = taskRepository.findTasksByCourseIdOrderByOrderItemAsc(2L);
         assertThat(foundTasks.size()).isEqualTo(0);
     }
+
+    @Test
+    void existsTasksByCourseIdAndByStatement__should_return_true_when_exists_tasks_with_the_course_id_and_statement() {
+        User user = new User("Eduardo", "eduardofettermann212@gmail.com", Role.INSTRUCTOR);
+        Course course = new Course(
+                "Object Calisthenics em Java ",
+                "Aprofunde-se em boas práticas de POO com Alura",
+                user
+        );
+        String statement = "Por que não devemos abreviar nomes de variáveis?";
+        Task firstTask = new Task(course, SINGLE_CHOICE, 1, statement);
+        Task lastTask = new Task(course, OPEN_TEXT, 2, statement);
+
+        userRepository.save(user);
+        courseRepository.save(course);
+        taskRepository.save(firstTask);
+        boolean existsTasksWithTheSameCourseIdAndStatement = taskRepository.existsTasksByCourseIdAndByStatement(
+                course.getId(),
+                lastTask.getStatement()
+        );
+
+        assertThat(existsTasksWithTheSameCourseIdAndStatement).isTrue();
+
+        existsTasksWithTheSameCourseIdAndStatement = taskRepository.existsTasksByCourseIdAndByStatement(2L, statement);
+        assertThat(existsTasksWithTheSameCourseIdAndStatement).isFalse();
+    }
 }
