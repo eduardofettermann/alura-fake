@@ -23,8 +23,16 @@ public class NewTaskDTO {
         this.courseId = courseId;
     }
 
+    public Type getType() {
+        return type;
+    }
+
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public int getOrder() {
+        return order;
     }
 
     public void setOrder(int order) {
