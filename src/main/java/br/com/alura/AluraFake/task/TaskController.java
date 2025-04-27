@@ -67,7 +67,7 @@ public class TaskController {
 
         return ResponseEntity.ok(tasks);
     }
-    
+
     public Optional<ResponseEntity<ErrorItemDTO>> validateTask(NewTaskDTO newTaskDTO) {
         boolean existsWithTheSameCourseIdAndStatement = taskRepository.existsTasksByCourseIdAndByStatement(
                 newTaskDTO.getCourseId(),
@@ -84,27 +84,29 @@ public class TaskController {
         }
 
         Integer higherTaskOrder = taskRepository.findMaxOrderByCourseId(newTaskDTO.getCourseId());
-        int nextOrderSequence = higherTaskOrder + 1;
-        boolean isIncorrectSequence = newTaskDTO.getOrder() > nextOrderSequence;
+        if (higherTaskOrder != null) {
+            int nextOrderSequence = higherTaskOrder + 1;
+            boolean isIncorrectSequence = newTaskDTO.getOrder() > nextOrderSequence;
 
-        if (isIncorrectSequence) {
-            return Optional.of(ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorItemDTO("order", "A ordem inserida está fora de sequência")));
-        }
+            if (isIncorrectSequence) {
+                return Optional.of(ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ErrorItemDTO("order", "A ordem inserida está fora de sequência")));
+            }
 
-        boolean shouldReorder = taskRepository.existsTasksByCourseIdAndByOrder(
-                newTaskDTO.getCourseId(),
-                newTaskDTO.getOrder()
-        );
-
-        if (shouldReorder) {
-            List<Task> tasksToReorder = taskRepository.findByCourseIdAndOrderGreaterThanEqualForUpdate(
-                    newTaskDTO.getCourseId(), newTaskDTO.getOrder()
+            boolean shouldReorder = taskRepository.existsTasksByCourseIdAndByOrder(
+                    newTaskDTO.getCourseId(),
+                    newTaskDTO.getOrder()
             );
 
-            tasksToReorder.forEach(task -> task.setOrder(task.getOrder() + 1));
+            if (shouldReorder) {
+                List<Task> tasksToReorder = taskRepository.findByCourseIdAndOrderGreaterThanEqualForUpdate(
+                        newTaskDTO.getCourseId(), newTaskDTO.getOrder()
+                );
 
-            taskRepository.saveAll(tasksToReorder);
+                tasksToReorder.forEach(task -> task.setOrder(task.getOrder() + 1));
+
+                taskRepository.saveAll(tasksToReorder);
+            }
         }
 
         return Optional.empty();
