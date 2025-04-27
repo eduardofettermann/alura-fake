@@ -74,10 +74,8 @@ public class TaskControllerTest {
         String statement = "Aprenda testes unitários com JUnit";
         newTaskDTO.setStatement(statement);
         newTaskDTO.setOrder(1);
-        System.out.println(objectMapper.writeValueAsString(newTaskDTO));
 
         when(taskRepository.existsTasksByCourseIdAndByStatement(courseId, statement)).thenReturn(true);
-        System.out.println(objectMapper.writeValueAsString(newTaskDTO));
 
         mockMvc.perform(post("/task/new/opentext")
                         .contentType(MediaType.APPLICATION_JSON)
