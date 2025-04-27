@@ -27,7 +27,15 @@ public class Task {
     @Deprecated
     public Task() {}
 
+    public Course getCourse() {
+        return course;
+    }
+
+    public Integer getOrder() {
+        return order;
+    }
+
     public String getStatement() {
-        return this.statement;
+        return statement;
     }
 }
