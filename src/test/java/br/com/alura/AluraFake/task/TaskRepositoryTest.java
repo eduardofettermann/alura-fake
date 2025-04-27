@@ -108,4 +108,32 @@ class TaskRepositoryTest {
         maxOrder = taskRepository.findMaxOrderByCourseId(2L);
         assertThat(maxOrder).isNull();
     }
+
+    @Test
+    void existsTasksByCourseIdAndByOrder__should_return_true_when_already_has_task_with_course_id_and_order() {
+        User user = new User("Eduardo", "eduardofettermann212@gmail.com", Role.INSTRUCTOR);
+        Course course = new Course(
+                "Object Calisthenics em Java ",
+                "Aprofunde-se em boas práticas de POO com Alura",
+                user
+        );
+        Task task = new Task(
+                course, OPEN_TEXT,
+                2,
+                "Pra que serve o Spring Security?"
+        );
+
+        userRepository.save(user);
+        courseRepository.save(course);
+        taskRepository.save(task);
+        boolean existsTasksByCourseIdAndByOrder = taskRepository.existsTasksByCourseIdAndByOrder(
+                course.getId(),
+                task.getOrder()
+        );
+
+        assertThat(existsTasksByCourseIdAndByOrder).isTrue();
+
+        existsTasksByCourseIdAndByOrder = taskRepository.existsTasksByCourseIdAndByOrder(2L, 2);
+        assertThat(existsTasksByCourseIdAndByOrder).isFalse();
+    }
 }
