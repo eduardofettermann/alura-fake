@@ -136,4 +136,39 @@ class TaskRepositoryTest {
         existsTasksByCourseIdAndByOrder = taskRepository.existsTasksByCourseIdAndByOrder(2L, 2);
         assertThat(existsTasksByCourseIdAndByOrder).isFalse();
     }
+    @Test
+    void findByCourseIdAndOrderGreaterThanEqualForUpdate__should_return_tasks_with_greater_or_equal_order() {
+        User user = new User("Eduardo", "eduardofettermann212@gmail.com", Role.INSTRUCTOR);
+        Course course = new Course(
+                "Object Calisthenics em Java ",
+                "Aprofunde-se em boas práticas de POO com Alura",
+                user
+        );
+        Task firstTask = new Task(
+                course, OPEN_TEXT,
+                1,
+                "Pra que serve o Spring Security?"
+        );
+        Task lastTask = new Task(
+                course, OPEN_TEXT,
+                2,
+                "Pra que serve o Spring Security?"
+        );
+        List<Task> expectedTasks = List.of(lastTask);
+
+        userRepository.save(user);
+        courseRepository.save(course);
+        taskRepository.save(firstTask);
+        taskRepository.save(lastTask);
+        List<Task> tasksWithGreaterOrderThanNewOrder = taskRepository.findByCourseIdAndOrderGreaterThanEqualForUpdate(
+                course.getId(),
+                lastTask.getOrder()
+        );
+
+        assertThat(tasksWithGreaterOrderThanNewOrder).isEqualTo(expectedTasks);
+
+        tasksWithGreaterOrderThanNewOrder = taskRepository
+                .findByCourseIdAndOrderGreaterThanEqualForUpdate(2L, 2);
+        assertThat(tasksWithGreaterOrderThanNewOrder).isEqualTo(List.of());
+    }
 }
