@@ -36,7 +36,7 @@ public class TaskController {
             return courseErrorItemDTOResponse.get();
         }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/task/new/singlechoice")
