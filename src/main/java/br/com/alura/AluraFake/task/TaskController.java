@@ -68,27 +68,14 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
-    public Optional<ResponseEntity<ErrorItemDTO>> validateTask(NewTaskDTO newTaskDTO) {
-        boolean existsWithTheSameCourseIdAndStatement = taskRepository.existsTasksByCourseIdAndByStatement(
-                newTaskDTO.getCourseId(),
-                newTaskDTO.getStatement()
-        );
-
-        if (existsWithTheSameCourseIdAndStatement) {
-            String message = "Já existe uma tarefa com o enunciado "
-                    .concat("'").concat(newTaskDTO.getStatement()).concat("'")
-                    .concat(" vinculado ao curso com ID ")
-                    .concat(newTaskDTO.getCourseId().toString());
-            return Optional.of(ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorItemDTO("statement", message)));
+    private Optional<ResponseEntity<ErrorItemDTO>> validateTask(NewTaskDTO newTaskDTO) {
+        if (taskRepository.existsTasksByCourseIdAndByStatement(newTaskDTO.getCourseId(), newTaskDTO.getStatement())) {
+            String message = String.format("Já existe uma tarefa com o enunciado '%s' vinculado ao curso com ID %d",
+                    newTaskDTO.getStatement(), newTaskDTO.getCourseId());
+            return Optional.of(buildErrorResponse("statement", message, HttpStatus.BAD_REQUEST));
         }
 
-        Optional<ResponseEntity<ErrorItemDTO>> orderTaskErrorItemDTOResponse = validateOrder(newTaskDTO);
-        if (orderTaskErrorItemDTOResponse.isPresent()) {
-            return orderTaskErrorItemDTOResponse;
-        }
-
-        return Optional.empty();
+        return validateOrder(newTaskDTO);
     }
 
     private Optional<ResponseEntity<ErrorItemDTO>> validateOrder(NewTaskDTO newTaskDTO) {
@@ -97,14 +84,11 @@ public class TaskController {
             return Optional.empty();
         }
 
-        int nextOrderBySequence = highestOrder + 1;
+        int expectedNextOrder = highestOrder + 1;
         int newOrder = newTaskDTO.getOrder();
 
-        if (newOrder > nextOrderBySequence) {
-            ErrorItemDTO error = new ErrorItemDTO("order", "A ordem inserida está fora de sequência");
-            return Optional.of(
-                    ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error)
-            );
+        if (newOrder > expectedNextOrder) {
+            return Optional.of(buildErrorResponse("order", "A ordem inserida está fora de sequência", HttpStatus.BAD_REQUEST));
         }
 
         if (taskRepository.existsTasksByCourseIdAndByOrder(newTaskDTO.getCourseId(), newOrder)) {
