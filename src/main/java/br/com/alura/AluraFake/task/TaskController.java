@@ -125,18 +125,14 @@ public class TaskController {
     }
 
     private Optional<ResponseEntity<ErrorItemDTO>> validateCourseByCourseId(Optional<Course> possibleCourse, Long courseId) {
-        String message;
-
         if (possibleCourse.isEmpty()) {
-            message = "Um curso com o ID ".concat(courseId.toString()).concat(" não foi encontrado.");
-            return Optional.of(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorItemDTO("courseId", message)));
+            String message = String.format("Um curso com o ID %d não foi encontrado.", courseId);
+            return Optional.of(buildErrorResponse("courseId", message, HttpStatus.NOT_FOUND));
         }
 
         if (!possibleCourse.get().isBuilding()) {
-            message = "O curso com o ID ".concat(courseId.toString()).concat(" não está em construção.");
-            return Optional.of(ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorItemDTO("courseId", message)));
+            String message = String.format("O curso com o ID %d não está em construção.", courseId);
+            return Optional.of(buildErrorResponse("courseId", message, HttpStatus.BAD_REQUEST));
         }
 
         return Optional.empty();
