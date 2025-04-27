@@ -31,12 +31,20 @@ public class TaskController {
             return taskErrorItemDTOResponse.get();
         }
 
-        Optional<ResponseEntity<ErrorItemDTO>> courseErrorItemDTOResponse = validateCourseByCourseId(newTaskDTO.getCourseId());
+        Optional<Course> possibleCourse = courseRepository.findById(newTaskDTO.getCourseId());
+
+        Optional<ResponseEntity<ErrorItemDTO>> courseErrorItemDTOResponse = validateCourseByCourseId(
+                possibleCourse,
+                newTaskDTO.getCourseId()
+        );
         if (courseErrorItemDTOResponse.isPresent()) {
             return courseErrorItemDTOResponse.get();
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        Task task = new Task(possibleCourse.get(), Type.OPEN_TEXT, newTaskDTO.getOrder(), newTaskDTO.getStatement());
+        taskRepository.save(task);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 
     @PostMapping("/task/new/singlechoice")
