@@ -9,10 +9,10 @@ public class NewTaskDTO {
     @NotNull
     private Type type;
     @NotNull
-    @Positive(message = "A ordem deve ser um inteiro positivo")
+    @Positive(message = "The order must be integer and positive")
     private int order;
     @NotBlank
-    @Size(min = 4, max = 255, message = "O enunciado deve ter entre 4 e 255 caracteres")
+    @Size(min = 4, max = 255, message = "The statement length must be between 4 and 255 characters")
     private String statement;
 
     public Long getCourseId() {
