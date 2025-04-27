@@ -141,4 +141,8 @@ public class TaskController {
 
         return Optional.empty();
     }
+
+    private ResponseEntity<ErrorItemDTO> buildErrorResponse(String field, String message, HttpStatus status) {
+        return ResponseEntity.status(status).body(new ErrorItemDTO(field, message));
+    }
 }
