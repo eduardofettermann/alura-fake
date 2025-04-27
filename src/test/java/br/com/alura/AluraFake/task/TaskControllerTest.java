@@ -142,5 +142,7 @@ public class TaskControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newTaskDTO)))
                 .andExpect(status().isCreated());
+
+        verify(taskRepository, times(1)).save(any(Task.class));
     }
 }
