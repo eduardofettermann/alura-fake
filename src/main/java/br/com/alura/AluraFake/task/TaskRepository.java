@@ -21,7 +21,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @Query("SELECT MAX(t.order) FROM Task t " +
             "WHERE t.course.id = :courseId")
-    Integer findMaxOrderByCourseId(@Param("courseId") Long courseId);
+    Integer findHighestOrderByCourseId(@Param("courseId") Long courseId);
 
     @Query("SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END " +
             "FROM Task t " +

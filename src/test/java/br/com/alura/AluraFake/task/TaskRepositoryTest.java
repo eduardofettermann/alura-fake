@@ -81,7 +81,7 @@ class TaskRepositoryTest {
     }
 
     @Test
-    void findMaxOrderByCourseId__should_return_max_task_order() {
+    void findMaxOrderByCourseId__should_return_highest_task_order() {
         User user = new User("Eduardo", "eduardofettermann212@gmail.com", Role.INSTRUCTOR);
         Course course = new Course(
                 "Object Calisthenics em Java ",
@@ -99,13 +99,13 @@ class TaskRepositoryTest {
         courseRepository.save(course);
         taskRepository.save(firstTask);
         taskRepository.save(lastTask);
-        Integer maxOrder = taskRepository.findMaxOrderByCourseId(
+        Integer maxOrder = taskRepository.findHighestOrderByCourseId(
                 course.getId()
         );
 
         assertThat(maxOrder).isEqualTo(lastTask.getOrder());
 
-        maxOrder = taskRepository.findMaxOrderByCourseId(2L);
+        maxOrder = taskRepository.findHighestOrderByCourseId(2L);
         assertThat(maxOrder).isNull();
     }
 

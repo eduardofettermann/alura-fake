@@ -143,7 +143,7 @@ public class TaskControllerTest {
 
         doReturn(Optional.of(course)).when(courseRepository).findById(newTaskDTO.getCourseId());
         doReturn(true).when(course).isBuilding();
-        doReturn(1).when(taskRepository).findMaxOrderByCourseId(newTaskDTO.getCourseId());
+        doReturn(1).when(taskRepository).findHighestOrderByCourseId(newTaskDTO.getCourseId());
 
         mockMvc.perform(post("/task/new/opentext")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -182,7 +182,7 @@ public class TaskControllerTest {
                 newTaskDTO.getCourseId(),
                 newTaskDTO.getStatement()
         )).thenReturn(false);
-        doReturn(2).when(taskRepository).findMaxOrderByCourseId(newTaskDTO.getCourseId());
+        doReturn(2).when(taskRepository).findHighestOrderByCourseId(newTaskDTO.getCourseId());
         when(taskRepository.existsTasksByCourseIdAndByOrder(
                 newTaskDTO.getCourseId(),
                 newTaskDTO.getOrder())
