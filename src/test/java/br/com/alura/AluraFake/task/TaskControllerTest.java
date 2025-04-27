@@ -2,6 +2,7 @@ package br.com.alura.AluraFake.task;
 
 import br.com.alura.AluraFake.course.Course;
 import br.com.alura.AluraFake.course.CourseRepository;
+import br.com.alura.AluraFake.course.Status;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,7 +109,6 @@ public class TaskControllerTest {
     @Test
     void newTask__should_return_bad_request_when_course_is_not_building() throws Exception {
         Course course = mock(Course.class);
-
         NewTaskDTO newTaskDTO = new NewTaskDTO();
         newTaskDTO.setCourseId(course.getId());
         newTaskDTO.setOrder(1);
@@ -125,5 +125,23 @@ public class TaskControllerTest {
                         .value("courseId"))
                 .andExpect(jsonPath("$.message")
                         .isNotEmpty());
+    }
+
+    @Test
+    void newTask__should_return_created_when_new_task_request_is_valid() throws Exception {
+        Course course = mock(Course.class);
+        NewTaskDTO newTaskDTO = new NewTaskDTO();
+        newTaskDTO.setCourseId(course.getId());
+        newTaskDTO.setOrder(1);
+        newTaskDTO.setType(Type.OPEN_TEXT);
+        newTaskDTO.setStatement("Aprenda a criar uma aplicação com autenticação utilizando Spring Security com Alura");
+
+        doReturn(Optional.of(course)).when(courseRepository).findById(newTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+
+        mockMvc.perform(post("/task/new/opentext")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newTaskDTO)))
+                .andExpect(status().isCreated());
     }
 }
