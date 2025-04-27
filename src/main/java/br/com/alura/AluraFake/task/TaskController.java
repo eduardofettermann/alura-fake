@@ -28,19 +28,19 @@ public class TaskController {
     @Transactional
     public ResponseEntity newOpenTextExercise(@RequestBody @Valid NewTaskDTO newTaskDTO) {
         Optional<Course> possibleCourse = courseRepository.findById(newTaskDTO.getCourseId());
-        Optional<ResponseEntity<ErrorItemDTO>> courseErrorItemDTOResponse = validateCourseByCourseId(
+        Optional<ResponseEntity<ErrorItemDTO>> possibleCourseErrorItemDTOResponse = validateCourseByCourseId(
                 possibleCourse,
                 newTaskDTO.getCourseId()
         );
 
-        if (courseErrorItemDTOResponse.isPresent()) {
-            return courseErrorItemDTOResponse.get();
+        if (possibleCourseErrorItemDTOResponse.isPresent()) {
+            return possibleCourseErrorItemDTOResponse.get();
         }
 
-        Optional<ResponseEntity<ErrorItemDTO>> taskErrorItemDTOResponse = validateTask(newTaskDTO);
+        Optional<ResponseEntity<ErrorItemDTO>> possibleTaskErrorItemDTOResponse = validateTask(newTaskDTO);
 
-        if (taskErrorItemDTOResponse.isPresent()) {
-            return taskErrorItemDTOResponse.get();
+        if (possibleTaskErrorItemDTOResponse.isPresent()) {
+            return possibleTaskErrorItemDTOResponse.get();
         }
 
         Task task = new Task(possibleCourse.get(), Type.OPEN_TEXT, newTaskDTO.getOrder(), newTaskDTO.getStatement());
@@ -83,7 +83,15 @@ public class TaskController {
                     .body(new ErrorItemDTO("statement", message)));
         }
 
-        Integer higherTaskOrder = taskRepository.findMaxOrderByCourseId(newTaskDTO.getCourseId());
+        Optional<ResponseEntity<ErrorItemDTO>> orderTaskErrorItemDTOResponse = validateOrder(newTaskDTO);
+        if (orderTaskErrorItemDTOResponse.isPresent()) {
+            return orderTaskErrorItemDTOResponse;
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<ResponseEntity<ErrorItemDTO>> validateOrder(NewTaskDTO newTaskDTO) {
         Integer higherTaskOrder = taskRepository.findHighestOrderByCourseId(newTaskDTO.getCourseId());
         if (higherTaskOrder != null) {
             int nextOrderSequence = higherTaskOrder + 1;
