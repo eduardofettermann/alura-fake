@@ -14,4 +14,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "FROM Task t " +
             "WHERE t.course.id = :courseId AND t.statement = :statement")
     boolean existsTasksByCourseIdAndByStatement(@Param("courseId") Long courseId, @Param("statement") String statement);
+
+    @Query("SELECT MAX(t.order)" +
+            "FROM Task t " +
+            "WHERE t.course.id = :courseId")
+    Integer findMaxOrderByCourseId(@Param("courseId") Long courseId);
 }
