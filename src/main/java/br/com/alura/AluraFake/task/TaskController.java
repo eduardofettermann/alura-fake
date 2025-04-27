@@ -67,8 +67,7 @@ public class TaskController {
 
         return ResponseEntity.ok(tasks);
     }
-
-    @Transactional
+    
     public Optional<ResponseEntity<ErrorItemDTO>> validateTask(NewTaskDTO newTaskDTO) {
         boolean existsWithTheSameCourseIdAndStatement = taskRepository.existsTasksByCourseIdAndByStatement(
                 newTaskDTO.getCourseId(),
