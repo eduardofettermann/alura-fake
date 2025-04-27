@@ -135,11 +135,11 @@ public class TaskControllerTest {
        newTaskDTO.setCourseId(course.getId());
        newTaskDTO.setStatement("Explique o que é KISS e as vantagens de sua utilização.");
        newTaskDTO.setType(Type.OPEN_TEXT);
-       newTaskDTO.setOrder(2);
-
+       newTaskDTO.setOrder(3);
 
        doReturn(Optional.of(course)).when(courseRepository).findById(newTaskDTO.getCourseId());
        doReturn(true).when(course).isBuilding();
+       doReturn(1).when(taskRepository).findMaxOrderByCourseId(newTaskDTO.getCourseId());
 
        mockMvc.perform(post("/task/new/opentext")
                        .contentType(MediaType.APPLICATION_JSON)
