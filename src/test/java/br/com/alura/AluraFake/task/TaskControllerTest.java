@@ -32,6 +32,26 @@ public class TaskControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
+    void newTask__should_return_not_found_when_course_with_id_doesnt_exists() throws Exception {
+        NewTaskDTO newTaskDTO = new NewTaskDTO();
+        newTaskDTO.setCourseId(1L);
+        newTaskDTO.setStatement("O que foi apresentado na Imersão Gemini?");
+        newTaskDTO.setOrder(1);
+        newTaskDTO.setType(Type.OPEN_TEXT);
+
+        doReturn(Optional.empty()).when(courseRepository).findById(newTaskDTO.getCourseId());
+
+        mockMvc.perform(post("/task/new/opentext")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newTaskDTO)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.field")
+                        .value("courseId"))
+                .andExpect(jsonPath("$.message")
+                        .isNotEmpty());
+    }
+
+    @Test
     void newTask__should_return_bad_request_when_statement_length_is_smaller_than_4() throws Exception {
         NewTaskDTO newTaskDTO = new NewTaskDTO();
         newTaskDTO.setCourseId(1L);
