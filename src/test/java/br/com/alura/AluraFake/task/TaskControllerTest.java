@@ -128,6 +128,29 @@ public class TaskControllerTest {
                         .isNotEmpty());
     }
 
+   @Test
+   void newTask__should_return_bad_request_when_order_is_out_of_sequence() throws Exception {
+       Course course = mock(Course.class);
+       NewTaskDTO newTaskDTO = new NewTaskDTO();
+       newTaskDTO.setCourseId(course.getId());
+       newTaskDTO.setStatement("Explique o que é KISS e as vantagens de sua utilização.");
+       newTaskDTO.setType(Type.OPEN_TEXT);
+       newTaskDTO.setOrder(2);
+
+
+       doReturn(Optional.of(course)).when(courseRepository).findById(newTaskDTO.getCourseId());
+       doReturn(true).when(course).isBuilding();
+
+       mockMvc.perform(post("/task/new/opentext")
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(objectMapper.writeValueAsString(newTaskDTO)))
+               .andExpect(status().isBadRequest())
+               .andExpect(jsonPath("$.field")
+                       .value("order"))
+               .andExpect(jsonPath("$.message")
+                       .isNotEmpty());
+   }
+
     @Test
     void newTask__should_return_created_when_new_task_request_is_valid() throws Exception {
         Course course = mock(Course.class);
