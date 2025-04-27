@@ -79,4 +79,33 @@ class TaskRepositoryTest {
         existsTasksWithTheSameCourseIdAndStatement = taskRepository.existsTasksByCourseIdAndByStatement(2L, statement);
         assertThat(existsTasksWithTheSameCourseIdAndStatement).isFalse();
     }
+
+    @Test
+    void findMaxOrderByCourseId__should_return_max_task_order() {
+        User user = new User("Eduardo", "eduardofettermann212@gmail.com", Role.INSTRUCTOR);
+        Course course = new Course(
+                "Object Calisthenics em Java ",
+                "Aprofunde-se em boas práticas de POO com Alura",
+                user
+        );
+        Task firstTask = new Task(course, SINGLE_CHOICE, 1, "Pra que serve o Spring Security?");
+        Task lastTask = new Task(
+                course, OPEN_TEXT,
+                2,
+                "Como é possível testar uma classe de serviço sem chamar a repository?"
+        );
+
+        userRepository.save(user);
+        courseRepository.save(course);
+        taskRepository.save(firstTask);
+        taskRepository.save(lastTask);
+        Integer maxOrder = taskRepository.findMaxOrderByCourseId(
+                course.getId()
+        );
+
+        assertThat(maxOrder).isEqualTo(lastTask.getOrder());
+
+        maxOrder = taskRepository.findMaxOrderByCourseId(2L);
+        assertThat(maxOrder).isNull();
+    }
 }
