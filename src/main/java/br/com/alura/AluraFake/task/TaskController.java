@@ -92,33 +92,36 @@ public class TaskController {
     }
 
     private Optional<ResponseEntity<ErrorItemDTO>> validateOrder(NewTaskDTO newTaskDTO) {
-        Integer higherTaskOrder = taskRepository.findHighestOrderByCourseId(newTaskDTO.getCourseId());
-        if (higherTaskOrder != null) {
-            int nextOrderSequence = higherTaskOrder + 1;
-            boolean isIncorrectSequence = newTaskDTO.getOrder() > nextOrderSequence;
+        Integer highestOrder = taskRepository.findHighestOrderByCourseId(newTaskDTO.getCourseId());
+        if (highestOrder == null) {
+            return Optional.empty();
+        }
 
-            if (isIncorrectSequence) {
-                return Optional.of(ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new ErrorItemDTO("order", "A ordem inserida está fora de sequência")));
-            }
+        int nextOrderBySequence = highestOrder + 1;
+        int newOrder = newTaskDTO.getOrder();
 
-            boolean shouldReorder = taskRepository.existsTasksByCourseIdAndByOrder(
-                    newTaskDTO.getCourseId(),
-                    newTaskDTO.getOrder()
+        if (newOrder > nextOrderBySequence) {
+            ErrorItemDTO error = new ErrorItemDTO("order", "A ordem inserida está fora de sequência");
+            return Optional.of(
+                    ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error)
             );
+        }
 
-            if (shouldReorder) {
-                List<Task> tasksToReorder = taskRepository.findByCourseIdAndOrderGreaterThanEqualForUpdate(
-                        newTaskDTO.getCourseId(), newTaskDTO.getOrder()
-                );
-
-                tasksToReorder.forEach(task -> task.setOrder(task.getOrder() + 1));
-
-                taskRepository.saveAll(tasksToReorder);
-            }
+        if (taskRepository.existsTasksByCourseIdAndByOrder(newTaskDTO.getCourseId(), newOrder)) {
+            reorderTasks(newTaskDTO);
         }
 
         return Optional.empty();
+    }
+
+    private void reorderTasks(NewTaskDTO newTaskDTO) {
+        List<Task> tasksToReorder = taskRepository.findByCourseIdAndOrderGreaterThanEqualForUpdate(
+                newTaskDTO.getCourseId(), newTaskDTO.getOrder()
+        );
+
+        tasksToReorder.forEach(task -> task.setOrder(task.getOrder() + 1));
+
+        taskRepository.saveAll(tasksToReorder);
     }
 
     private Optional<ResponseEntity<ErrorItemDTO>> validateCourseByCourseId(Optional<Course> possibleCourse, Long courseId) {
