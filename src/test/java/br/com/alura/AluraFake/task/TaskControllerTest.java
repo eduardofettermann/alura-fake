@@ -380,4 +380,49 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$[0].message")
                         .isNotEmpty());
     }
+
+    @Test
+    void newSingleChoice__should_return_bad_request_when_task_has_more_than_five_options() throws Exception {
+        Course course = mock(Course.class);
+        NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
+        newSingleChoiceTaskDTO.setCourseId(course.getId());
+        newSingleChoiceTaskDTO.setType(Type.SINGLE_CHOICE);
+        newSingleChoiceTaskDTO.setOrder(1);
+        newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
+
+        NewAlternativeDTO docker = new NewAlternativeDTO();
+        NewAlternativeDTO java = new NewAlternativeDTO();
+        NewAlternativeDTO spring = new NewAlternativeDTO();
+        NewAlternativeDTO elk = new NewAlternativeDTO();
+        NewAlternativeDTO aws = new NewAlternativeDTO();
+        NewAlternativeDTO oci = new NewAlternativeDTO();
+
+        docker.setOption("Docker");
+        java.setOption("Java 21");
+        spring.setOption("Spring");
+        elk.setOption("ElasticSearch, Kibana e Logstash");
+        aws.setOption("Amazon Web Services");
+        oci.setOption("Oracle Cloud Infrastructure");
+
+        docker.setCorrect();
+        java.setIncorrect();
+        spring.setIncorrect();
+        elk.setIncorrect();
+        aws.setIncorrect();
+        oci.setIncorrect();
+
+        newSingleChoiceTaskDTO.setOptions(List.of(docker, java, spring, elk, aws, oci));
+
+        doReturn(Optional.of(course)).when(courseRepository).findById(newSingleChoiceTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+
+        mockMvc.perform(post("/task/new/singlechoice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newSingleChoiceTaskDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].field")
+                        .value("options"))
+                .andExpect(jsonPath("$[0].message")
+                        .isNotEmpty());
+    }
 }
