@@ -82,10 +82,10 @@ public class TaskController {
                 .count() > 1;
 
         if (hasMoreOneCorrectAlternative) {
-            return Optional.of(buildErrorResponse(
+            return buildErrorResponse(
                     "options",
                     "A atividade deve ter apenas uma única alternativa correta.",
-                    HttpStatus.BAD_REQUEST));
+                    HttpStatus.BAD_REQUEST);
         }
 
         return Optional.empty();
@@ -109,7 +109,7 @@ public class TaskController {
         if (taskRepository.existsTasksByCourseIdAndByStatement(newTaskDTO.getCourseId(), newTaskDTO.getStatement())) {
             String message = String.format("Já existe uma tarefa com o enunciado '%s' vinculado ao curso com ID %d",
                     newTaskDTO.getStatement(), newTaskDTO.getCourseId());
-            return Optional.of(buildErrorResponse("statement", message, HttpStatus.BAD_REQUEST));
+            return buildErrorResponse("statement", message, HttpStatus.BAD_REQUEST);
         }
 
         return validateOrder(newTaskDTO);
@@ -119,7 +119,7 @@ public class TaskController {
         Integer highestOrder = taskRepository.findHighestOrderByCourseId(newTaskDTO.getCourseId());
 
         if (highestOrder == null && newTaskDTO.getOrder() != 1) {
-            return Optional.of(buildErrorResponse("order", "A ordem inserida está fora de sequência", HttpStatus.BAD_REQUEST));
+            return buildErrorResponse("order", "A ordem inserida está fora de sequência", HttpStatus.BAD_REQUEST);
         }
 
         if (highestOrder != null) {
@@ -127,7 +127,7 @@ public class TaskController {
             int newOrder = newTaskDTO.getOrder();
 
             if (newOrder > expectedNextOrder) {
-                return Optional.of(buildErrorResponse("order", "A ordem inserida está fora de sequência", HttpStatus.BAD_REQUEST));
+                return buildErrorResponse("order", "A ordem inserida está fora de sequência", HttpStatus.BAD_REQUEST);
             }
 
             if (taskRepository.existsTasksByCourseIdAndByOrder(newTaskDTO.getCourseId(), newOrder)) {
@@ -151,18 +151,18 @@ public class TaskController {
     private Optional<ResponseEntity<ErrorItemDTO>> validateCourseByCourseId(Optional<Course> possibleCourse, Long courseId) {
         if (possibleCourse.isEmpty()) {
             String message = String.format("Um curso com o ID %d não foi encontrado.", courseId);
-            return Optional.of(buildErrorResponse("courseId", message, HttpStatus.NOT_FOUND));
+            return buildErrorResponse("courseId", message, HttpStatus.NOT_FOUND);
         }
 
         if (!possibleCourse.get().isBuilding()) {
             String message = String.format("O curso com o ID %d não está em construção.", courseId);
-            return Optional.of(buildErrorResponse("courseId", message, HttpStatus.BAD_REQUEST));
+            return buildErrorResponse("courseId", message, HttpStatus.BAD_REQUEST);
         }
 
         return Optional.empty();
     }
 
-    private ResponseEntity<ErrorItemDTO> buildErrorResponse(String field, String message, HttpStatus status) {
-        return ResponseEntity.status(status).body(new ErrorItemDTO(field, message));
+    private Optional<ResponseEntity<ErrorItemDTO>> buildErrorResponse(String field, String message, HttpStatus status) {
+        return Optional.of(ResponseEntity.status(status).body(new ErrorItemDTO(field, message)));
     }
 }
