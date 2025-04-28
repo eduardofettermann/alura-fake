@@ -490,4 +490,36 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.message")
                         .isNotEmpty());
     }
+
+    @Test
+    void newSingleChoice__should_return_bad_request_when_task_has_alternatives_with_options_equals_to_statement() throws Exception {
+        Course course = mock(Course.class);
+        NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
+        newSingleChoiceTaskDTO.setCourseId(course.getId());
+        newSingleChoiceTaskDTO.setType(Type.SINGLE_CHOICE);
+        newSingleChoiceTaskDTO.setOrder(1);
+        newSingleChoiceTaskDTO.setStatement("Fazer deploy com Github Actions");
+
+        NewAlternativeDTO deploy = new NewAlternativeDTO();
+        NewAlternativeDTO codeReview = new NewAlternativeDTO();
+
+        deploy.setOption("Fazer deploy com Github Actions");
+        codeReview.setOption("Code review");
+
+        deploy.setCorrect();
+        codeReview.setIncorrect();
+
+        newSingleChoiceTaskDTO.setOptions(List.of(deploy, codeReview));
+        doReturn(Optional.of(course)).when(courseRepository).findById(newSingleChoiceTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+
+        mockMvc.perform(post("/task/new/singlechoice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newSingleChoiceTaskDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.field")
+                        .value("options"))
+                .andExpect(jsonPath("$.message")
+                        .isNotEmpty());
+    }
 }
