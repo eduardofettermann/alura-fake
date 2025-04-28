@@ -1,5 +1,6 @@
 package br.com.alura.AluraFake.task;
 
+import br.com.alura.AluraFake.alternative.Alternative;
 import br.com.alura.AluraFake.alternative.NewAlternativeDTO;
 import br.com.alura.AluraFake.course.Course;
 import br.com.alura.AluraFake.course.CourseRepository;
@@ -11,10 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -54,6 +52,7 @@ public class TaskController {
     }
 
     @PostMapping("/task/new/singlechoice")
+    @Transactional
     public ResponseEntity newSingleChoice(@RequestBody @Valid NewSingleChoiceTaskDTO newSingleChoiceTaskDTO) {
         Optional<Course> possibleCourse = courseRepository.findById(newSingleChoiceTaskDTO.getCourseId());
         Optional<ResponseEntity<ErrorItemDTO>> possibleCourseErrorItemDTOResponse = validateCourseByCourseId(
@@ -76,7 +75,21 @@ public class TaskController {
             return possibleOptionsErrorItemDTOResponse.get();
         }
 
-        return ResponseEntity.ok().build();
+        Task task = new Task(
+                possibleCourse.get(),
+                Type.SINGLE_CHOICE,
+                newSingleChoiceTaskDTO.getOrder(),
+                newSingleChoiceTaskDTO.getStatement()
+        );
+
+        List<Alternative> alternatives = newSingleChoiceTaskDTO.getOptions().stream()
+                .map(option -> new Alternative(task, option.getOption(), option.isCorrect()))
+                .toList();
+        task.setAlternatives(alternatives);
+
+        taskRepository.save(task);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/task/new/multiplechoice")
