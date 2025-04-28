@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 public class TaskController {
@@ -77,7 +79,8 @@ public class TaskController {
     }
 
     private Optional<ResponseEntity<ErrorItemDTO>> validateSingleChoice(@Valid NewSingleChoiceTaskDTO newSingleChoiceTaskDTO) {
-        boolean hasMoreOneCorrectAlternative = newSingleChoiceTaskDTO.getOptions().stream()
+        List<NewAlternativeDTO> options = newSingleChoiceTaskDTO.getOptions();
+        boolean hasMoreOneCorrectAlternative = options.stream()
                 .filter(NewAlternativeDTO::isCorrect)
                 .count() > 1;
 
@@ -86,6 +89,14 @@ public class TaskController {
                     "options",
                     "A atividade deve ter apenas uma única alternativa correta.",
                     HttpStatus.BAD_REQUEST);
+        }
+
+        Set<String> optionsWithoutRepetition = options.stream()
+                .map(NewAlternativeDTO::getOption)
+                .collect(Collectors.toSet());
+
+        if (options.size() != optionsWithoutRepetition.size()) {
+            return buildErrorResponse("options", "As alternativas não podem ser iguais entre si", HttpStatus.BAD_REQUEST);
         }
 
         return Optional.empty();
