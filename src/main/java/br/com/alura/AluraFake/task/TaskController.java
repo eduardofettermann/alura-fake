@@ -50,7 +50,23 @@ public class TaskController {
     }
 
     @PostMapping("/task/new/singlechoice")
-    public ResponseEntity newSingleChoice() {
+    public ResponseEntity newSingleChoice(@RequestBody @Valid NewSingleChoiceTaskDTO newSingleChoiceTaskDTO) {
+        Optional<Course> possibleCourse = courseRepository.findById(newSingleChoiceTaskDTO.getCourseId());
+        Optional<ResponseEntity<ErrorItemDTO>> possibleCourseErrorItemDTOResponse = validateCourseByCourseId(
+                possibleCourse,
+                newSingleChoiceTaskDTO.getCourseId()
+        );
+
+        if (possibleCourseErrorItemDTOResponse.isPresent()) {
+            return possibleCourseErrorItemDTOResponse.get();
+        }
+
+        Optional<ResponseEntity<ErrorItemDTO>> possibleTaskErrorItemDTOResponse = validateTask(newSingleChoiceTaskDTO);
+
+        if (possibleTaskErrorItemDTOResponse.isPresent()) {
+            return possibleTaskErrorItemDTOResponse.get();
+        }
+
         return ResponseEntity.ok().build();
     }
 
