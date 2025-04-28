@@ -28,4 +28,8 @@ public class NewSingleChoiceTaskDTO extends NewTaskDTO {
 
     @Override
     public void setType(Type type) { /* O tipo é sempre SINGLE_CHOICE */ }
+
+    public NewSingleChoiceTaskDTO() {
+        super.setType(Type.SINGLE_CHOICE);
+    }
 }

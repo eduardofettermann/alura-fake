@@ -9,4 +9,8 @@ public class NewOpenTextTaskDTO extends NewTaskDTO{
 
     @Override
     public void setType(Type type) { /* O tipo é sempre OPEN_TEXT */ }
+
+    public NewOpenTextTaskDTO() {
+        super.setType(Type.OPEN_TEXT);
+    }
 }
