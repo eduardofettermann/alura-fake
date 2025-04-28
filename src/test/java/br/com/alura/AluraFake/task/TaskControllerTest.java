@@ -33,18 +33,17 @@ public class TaskControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void newTask__should_return_not_found_when_course_with_id_doesnt_exists() throws Exception {
-        NewTaskDTO newTaskDTO = new NewTaskDTO();
-        newTaskDTO.setCourseId(1L);
-        newTaskDTO.setStatement("O que foi apresentado na Imersão Gemini?");
-        newTaskDTO.setOrder(1);
-        newTaskDTO.setType(Type.OPEN_TEXT);
+    void newOpenTextExercise__should_return_not_found_when_course_with_id_doesnt_exists() throws Exception {
+        NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
+        newOpenTextTaskDTO.setCourseId(1L);
+        newOpenTextTaskDTO.setStatement("O que foi apresentado na Imersão Gemini?");
+        newOpenTextTaskDTO.setOrder(1);
 
-        doReturn(Optional.empty()).when(courseRepository).findById(newTaskDTO.getCourseId());
+        doReturn(Optional.empty()).when(courseRepository).findById(newOpenTextTaskDTO.getCourseId());
 
         mockMvc.perform(post("/task/new/opentext")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .content(objectMapper.writeValueAsString(newOpenTextTaskDTO)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.field")
                         .value("courseId"))
@@ -53,16 +52,15 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newTask__should_return_bad_request_when_statement_length_is_smaller_than_4() throws Exception {
-        NewTaskDTO newTaskDTO = new NewTaskDTO();
-        newTaskDTO.setCourseId(1L);
-        newTaskDTO.setStatement("123");
-        newTaskDTO.setOrder(1);
-        newTaskDTO.setType(Type.OPEN_TEXT);
+    void newOpenTextExercise__should_return_bad_request_when_statement_length_is_smaller_than_4() throws Exception {
+        NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
+        newOpenTextTaskDTO.setCourseId(1L);
+        newOpenTextTaskDTO.setStatement("123");
+        newOpenTextTaskDTO.setOrder(1);
 
         mockMvc.perform(post("/task/new/opentext")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .content(objectMapper.writeValueAsString(newOpenTextTaskDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0].field")
                         .value("statement"))
@@ -71,17 +69,16 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newTask__should_return_bad_request_when_statement_length_is_grater_than_255() throws Exception {
-        NewTaskDTO newTaskDTO = new NewTaskDTO();
-        newTaskDTO.setCourseId(1L);
+    void newOpenTextExercise__should_return_bad_request_when_statement_length_is_grater_than_255() throws Exception {
+        NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
+        newOpenTextTaskDTO.setCourseId(1L);
         String statement = "a".repeat(256);
-        newTaskDTO.setStatement(statement);
-        newTaskDTO.setOrder(1);
-        newTaskDTO.setType(Type.OPEN_TEXT);
+        newOpenTextTaskDTO.setStatement(statement);
+        newOpenTextTaskDTO.setOrder(1);
 
         mockMvc.perform(post("/task/new/opentext")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .content(objectMapper.writeValueAsString(newOpenTextTaskDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0].field")
                         .value("statement"))
@@ -90,23 +87,22 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newTask__should_return_bad_request_when_statement_is_duplicated_by_course_id() throws Exception {
+    void newOpenTextExercise__should_return_bad_request_when_statement_is_duplicated_by_course_id() throws Exception {
         Course course = mock(Course.class);
-        NewTaskDTO newTaskDTO = new NewTaskDTO();
-        newTaskDTO.setType(Type.OPEN_TEXT);
+        NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
         Long courseId = 1L;
-        newTaskDTO.setCourseId(courseId);
+        newOpenTextTaskDTO.setCourseId(courseId);
         String statement = "Aprenda testes unitários com JUnit";
-        newTaskDTO.setStatement(statement);
-        newTaskDTO.setOrder(1);
+        newOpenTextTaskDTO.setStatement(statement);
+        newOpenTextTaskDTO.setOrder(1);
 
-        doReturn(Optional.of(course)).when(courseRepository).findById(newTaskDTO.getCourseId());
+        doReturn(Optional.of(course)).when(courseRepository).findById(newOpenTextTaskDTO.getCourseId());
         doReturn(true).when(course).isBuilding();
         when(taskRepository.existsTasksByCourseIdAndByStatement(courseId, statement)).thenReturn(true);
 
         mockMvc.perform(post("/task/new/opentext")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .content(objectMapper.writeValueAsString(newOpenTextTaskDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.field")
                         .value("statement"))
@@ -115,16 +111,15 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newTask__should_return_bad_request_when_order_is_negative() throws Exception {
-        NewTaskDTO newTaskDTO = new NewTaskDTO();
-        newTaskDTO.setCourseId(1L);
-        newTaskDTO.setOrder(-1);
-        newTaskDTO.setType(Type.OPEN_TEXT);
-        newTaskDTO.setStatement("Aprenda a criar uma aplicação com autenticação utilizando Spring Security com Alura");
+    void newOpenTextExercise__should_return_bad_request_when_order_is_negative() throws Exception {
+        NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
+        newOpenTextTaskDTO.setCourseId(1L);
+        newOpenTextTaskDTO.setOrder(-1);
+        newOpenTextTaskDTO.setStatement("Aprenda a criar uma aplicação com autenticação utilizando Spring Security com Alura");
 
         mockMvc.perform(post("/task/new/opentext")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .content(objectMapper.writeValueAsString(newOpenTextTaskDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0].field")
                         .value("order"))
@@ -133,19 +128,18 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newTask__should_return_bad_request_when_course_is_not_building() throws Exception {
+    void newOpenTextExercise__should_return_bad_request_when_course_is_not_building() throws Exception {
         Course course = mock(Course.class);
-        NewTaskDTO newTaskDTO = new NewTaskDTO();
-        newTaskDTO.setCourseId(course.getId());
-        newTaskDTO.setOrder(1);
-        newTaskDTO.setType(Type.OPEN_TEXT);
-        newTaskDTO.setStatement("Aprenda a criar uma aplicação com autenticação utilizando Spring Security com Alura");
+        NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
+        newOpenTextTaskDTO.setCourseId(course.getId());
+        newOpenTextTaskDTO.setOrder(1);
+        newOpenTextTaskDTO.setStatement("Aprenda a criar uma aplicação com autenticação utilizando Spring Security com Alura");
 
-        doReturn(Optional.of(course)).when(courseRepository).findById(newTaskDTO.getCourseId());
+        doReturn(Optional.of(course)).when(courseRepository).findById(newOpenTextTaskDTO.getCourseId());
 
         mockMvc.perform(post("/task/new/opentext")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .content(objectMapper.writeValueAsString(newOpenTextTaskDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.field")
                         .value("courseId"))
@@ -154,21 +148,20 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newTask__should_return_bad_request_when_order_is_out_of_sequence() throws Exception {
+    void newOpenTextExercise__should_return_bad_request_when_order_is_out_of_sequence() throws Exception {
         Course course = mock(Course.class);
-        NewTaskDTO newTaskDTO = new NewTaskDTO();
-        newTaskDTO.setCourseId(course.getId());
-        newTaskDTO.setStatement("Explique o que é KISS e as vantagens de sua utilização.");
-        newTaskDTO.setType(Type.OPEN_TEXT);
-        newTaskDTO.setOrder(3);
+        NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
+        newOpenTextTaskDTO.setCourseId(course.getId());
+        newOpenTextTaskDTO.setStatement("Explique o que é KISS e as vantagens de sua utilização.");
+        newOpenTextTaskDTO.setOrder(3);
 
-        doReturn(Optional.of(course)).when(courseRepository).findById(newTaskDTO.getCourseId());
+        doReturn(Optional.of(course)).when(courseRepository).findById(newOpenTextTaskDTO.getCourseId());
         doReturn(true).when(course).isBuilding();
-        doReturn(1).when(taskRepository).findHighestOrderByCourseId(newTaskDTO.getCourseId());
+        doReturn(1).when(taskRepository).findHighestOrderByCourseId(newOpenTextTaskDTO.getCourseId());
 
         mockMvc.perform(post("/task/new/opentext")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .content(objectMapper.writeValueAsString(newOpenTextTaskDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.field")
                         .value("order"))
@@ -177,21 +170,20 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newTask__should_return_bad_request_when_hasnt_tasks_with_course_id_and_order_is_out_of_sequence() throws Exception {
+    void newOpenTextExercise__should_return_bad_request_when_hasnt_tasks_with_course_id_and_order_is_out_of_sequence() throws Exception {
         Course course = mock(Course.class);
-        NewTaskDTO newTaskDTO = new NewTaskDTO();
-        newTaskDTO.setCourseId(course.getId());
-        newTaskDTO.setStatement("Explique o que é KISS e as vantagens de sua utilização.");
-        newTaskDTO.setType(Type.OPEN_TEXT);
-        newTaskDTO.setOrder(2);
+        NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
+        newOpenTextTaskDTO.setCourseId(course.getId());
+        newOpenTextTaskDTO.setStatement("Explique o que é KISS e as vantagens de sua utilização.");
+        newOpenTextTaskDTO.setOrder(2);
 
-        doReturn(Optional.of(course)).when(courseRepository).findById(newTaskDTO.getCourseId());
+        doReturn(Optional.of(course)).when(courseRepository).findById(newOpenTextTaskDTO.getCourseId());
         doReturn(true).when(course).isBuilding();
-        doReturn(null).when(taskRepository).findHighestOrderByCourseId(newTaskDTO.getCourseId());
+        doReturn(null).when(taskRepository).findHighestOrderByCourseId(newOpenTextTaskDTO.getCourseId());
 
         mockMvc.perform(post("/task/new/opentext")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .content(objectMapper.writeValueAsString(newOpenTextTaskDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.field")
                         .value("order"))
@@ -200,13 +192,12 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newTask__should_reorder_tasks_and_return_created_when_order_is_smaller_than_greater_order() throws Exception {
+    void newOpenTextExercise__should_reorder_tasks_and_return_created_when_order_is_smaller_than_greater_order() throws Exception {
         Course course = mock(Course.class);
-        NewTaskDTO newTaskDTO = new NewTaskDTO();
-        newTaskDTO.setCourseId(course.getId());
-        newTaskDTO.setStatement("Explique o que é KISS e as vantagens de sua utilização.");
-        newTaskDTO.setType(Type.OPEN_TEXT);
-        newTaskDTO.setOrder(2);
+        NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
+        newOpenTextTaskDTO.setCourseId(course.getId());
+        newOpenTextTaskDTO.setStatement("Explique o que é KISS e as vantagens de sua utilização.");
+        newOpenTextTaskDTO.setOrder(2);
         Task mockitoTask = new Task(
                 course,
                 Type.OPEN_TEXT,
@@ -220,47 +211,46 @@ public class TaskControllerTest {
                 "Qual desses frameworks serve para auxiliar na criação de REST APIs?");
         List<Task> tasks = List.of(mockitoTask, springBootTask);
 
-        doReturn(Optional.of(course)).when(courseRepository).findById(newTaskDTO.getCourseId());
+        doReturn(Optional.of(course)).when(courseRepository).findById(newOpenTextTaskDTO.getCourseId());
         doReturn(true).when(course).isBuilding();
         when(taskRepository.existsTasksByCourseIdAndByStatement(
-                newTaskDTO.getCourseId(),
-                newTaskDTO.getStatement()
+                newOpenTextTaskDTO.getCourseId(),
+                newOpenTextTaskDTO.getStatement()
         )).thenReturn(false);
-        doReturn(2).when(taskRepository).findHighestOrderByCourseId(newTaskDTO.getCourseId());
+        doReturn(2).when(taskRepository).findHighestOrderByCourseId(newOpenTextTaskDTO.getCourseId());
         when(taskRepository.existsTasksByCourseIdAndByOrder(
-                newTaskDTO.getCourseId(),
-                newTaskDTO.getOrder())
+                newOpenTextTaskDTO.getCourseId(),
+                newOpenTextTaskDTO.getOrder())
         ).thenReturn(true);
 
         when(taskRepository.findByCourseIdAndOrderGreaterThanEqualForUpdate(
-                newTaskDTO.getCourseId(),
-                newTaskDTO.getOrder()
+                newOpenTextTaskDTO.getCourseId(),
+                newOpenTextTaskDTO.getOrder()
         )).thenReturn(tasks);
 
         mockMvc.perform(post("/task/new/opentext")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .content(objectMapper.writeValueAsString(newOpenTextTaskDTO)))
                 .andExpect(status().isCreated());
 
         verify(taskRepository, times(1)).save(any(Task.class));
     }
 
     @Test
-    void newTask__should_return_created_when_new_task_request_is_valid() throws Exception {
+    void newOpenTextExercise__should_return_created_when_new_task_request_is_valid() throws Exception {
         Course course = mock(Course.class);
-        NewTaskDTO newTaskDTO = new NewTaskDTO();
-        newTaskDTO.setCourseId(course.getId());
-        newTaskDTO.setOrder(1);
-        newTaskDTO.setType(Type.OPEN_TEXT);
-        newTaskDTO.setStatement("Aprenda a criar uma aplicação com autenticação utilizando Spring Security com Alura");
+        NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
+        newOpenTextTaskDTO.setCourseId(course.getId());
+        newOpenTextTaskDTO.setOrder(1);
+        newOpenTextTaskDTO.setStatement("Aprenda a criar uma aplicação com autenticação utilizando Spring Security com Alura");
 
-        doReturn(Optional.of(course)).when(courseRepository).findById(newTaskDTO.getCourseId());
+        doReturn(Optional.of(course)).when(courseRepository).findById(newOpenTextTaskDTO.getCourseId());
         doReturn(true).when(course).isBuilding();
-        doReturn(null).when(taskRepository).findHighestOrderByCourseId(newTaskDTO.getCourseId());
+        doReturn(null).when(taskRepository).findHighestOrderByCourseId(newOpenTextTaskDTO.getCourseId());
 
         mockMvc.perform(post("/task/new/opentext")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newTaskDTO)))
+                        .content(objectMapper.writeValueAsString(newOpenTextTaskDTO)))
                 .andExpect(status().isCreated());
 
         verify(taskRepository, times(1)).save(any(Task.class));
@@ -290,7 +280,6 @@ public class TaskControllerTest {
         Course course = mock(Course.class);
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
         newSingleChoiceTaskDTO.setCourseId(course.getId());
-        newSingleChoiceTaskDTO.setType(Type.SINGLE_CHOICE);
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
@@ -324,7 +313,6 @@ public class TaskControllerTest {
         Course course = mock(Course.class);
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
         newSingleChoiceTaskDTO.setCourseId(course.getId());
-        newSingleChoiceTaskDTO.setType(Type.SINGLE_CHOICE);
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
@@ -358,7 +346,6 @@ public class TaskControllerTest {
         Course course = mock(Course.class);
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
         newSingleChoiceTaskDTO.setCourseId(course.getId());
-        newSingleChoiceTaskDTO.setType(Type.SINGLE_CHOICE);
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
@@ -386,7 +373,6 @@ public class TaskControllerTest {
         Course course = mock(Course.class);
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
         newSingleChoiceTaskDTO.setCourseId(course.getId());
-        newSingleChoiceTaskDTO.setType(Type.SINGLE_CHOICE);
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
@@ -431,7 +417,6 @@ public class TaskControllerTest {
         Course course = mock(Course.class);
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
         newSingleChoiceTaskDTO.setCourseId(course.getId());
-        newSingleChoiceTaskDTO.setType(Type.SINGLE_CHOICE);
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
@@ -464,7 +449,6 @@ public class TaskControllerTest {
         Course course = mock(Course.class);
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
         newSingleChoiceTaskDTO.setCourseId(course.getId());
-        newSingleChoiceTaskDTO.setType(Type.SINGLE_CHOICE);
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
@@ -496,7 +480,6 @@ public class TaskControllerTest {
         Course course = mock(Course.class);
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
         newSingleChoiceTaskDTO.setCourseId(course.getId());
-        newSingleChoiceTaskDTO.setType(Type.SINGLE_CHOICE);
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("Fazer deploy com Github Actions");
 
@@ -528,7 +511,6 @@ public class TaskControllerTest {
         Course course = mock(Course.class);
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
         newSingleChoiceTaskDTO.setCourseId(course.getId());
-        newSingleChoiceTaskDTO.setType(Type.SINGLE_CHOICE);
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
