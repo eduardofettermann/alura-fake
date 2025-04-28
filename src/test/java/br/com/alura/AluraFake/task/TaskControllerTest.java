@@ -539,4 +539,296 @@ public class TaskControllerTest {
 
         verify(taskRepository, times(1)).save(any(Task.class));
     }
+
+    @Test
+    void newMultipleChoice__should_return_bad_request_when_any_option_length_is_smaller_than_4() throws Exception {
+        Course course = mock(Course.class);
+        NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO = new NewMultipleChoiceTaskDTO();
+        newMultipleChoiceTaskDTO.setCourseId(course.getId());
+        newMultipleChoiceTaskDTO.setOrder(1);
+        newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
+
+        NewAlternativeDTO alternativeWithOptionInvalid = new NewAlternativeDTO();
+        NewAlternativeDTO java = new NewAlternativeDTO();
+        NewAlternativeDTO spring = new NewAlternativeDTO();
+
+        alternativeWithOptionInvalid.setOption("123");
+        java.setOption("Java 21");
+        spring.setOption("Spring");
+
+        alternativeWithOptionInvalid.setIncorrect();
+        java.setCorrect();
+        spring.setCorrect();
+
+        newMultipleChoiceTaskDTO.setOptions(List.of(alternativeWithOptionInvalid, java, spring));
+
+        doReturn(Optional.of(course)).when(courseRepository).findById(newMultipleChoiceTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+
+        mockMvc.perform(post("/task/new/multiplechoice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newMultipleChoiceTaskDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].field")
+                        .value("options[0].option"))
+                .andExpect(jsonPath("$[0].message")
+                        .isNotEmpty());
+    }
+
+    @Test
+    void newMultipleChoice__should_return_bad_request_when_any_option_length_is_greater_than_80() throws Exception {
+        Course course = mock(Course.class);
+        NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO = new NewMultipleChoiceTaskDTO();
+        newMultipleChoiceTaskDTO.setCourseId(course.getId());
+        newMultipleChoiceTaskDTO.setOrder(1);
+        newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
+
+        NewAlternativeDTO alternativeWithOptionInvalid = new NewAlternativeDTO();
+        NewAlternativeDTO java = new NewAlternativeDTO();
+        NewAlternativeDTO spring = new NewAlternativeDTO();
+
+        alternativeWithOptionInvalid.setOption("caelum".repeat(14));
+        java.setOption("Java 21");
+        spring.setOption("Spring");
+
+        alternativeWithOptionInvalid.setIncorrect();
+        java.setCorrect();
+        spring.setCorrect();
+
+        newMultipleChoiceTaskDTO.setOptions(List.of(alternativeWithOptionInvalid, java, spring));
+
+        doReturn(Optional.of(course)).when(courseRepository).findById(newMultipleChoiceTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+
+        mockMvc.perform(post("/task/new/multiplechoice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newMultipleChoiceTaskDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].field")
+                        .value("options[0].option"))
+                .andExpect(jsonPath("$[0].message")
+                        .isNotEmpty());
+    }
+
+    @Test
+    void newMultipleChoice__should_return_bad_request_when_task_has_no_at_least_three_options() throws Exception {
+        Course course = mock(Course.class);
+        NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO = new NewMultipleChoiceTaskDTO();
+        newMultipleChoiceTaskDTO.setCourseId(course.getId());
+        newMultipleChoiceTaskDTO.setOrder(1);
+        newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
+
+        NewAlternativeDTO alternative = new NewAlternativeDTO();
+        NewAlternativeDTO otherAlternative = new NewAlternativeDTO();
+
+        alternative.setOption("Redis");
+        otherAlternative.setOption("MySQL");
+
+        alternative.setCorrect();
+        otherAlternative.setIncorrect();
+
+        newMultipleChoiceTaskDTO.setOptions(List.of(alternative, otherAlternative));
+
+        doReturn(Optional.of(course)).when(courseRepository).findById(newMultipleChoiceTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+
+        mockMvc.perform(post("/task/new/multiplechoice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newMultipleChoiceTaskDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].field")
+                        .value("options"))
+                .andExpect(jsonPath("$[0].message")
+                        .isNotEmpty());
+    }
+
+    @Test
+    void newMultipleChoice__should_return_bad_request_when_task_has_more_than_five_options() throws Exception {
+        Course course = mock(Course.class);
+        NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO = new NewMultipleChoiceTaskDTO();
+        newMultipleChoiceTaskDTO.setCourseId(course.getId());
+        newMultipleChoiceTaskDTO.setOrder(1);
+        newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
+
+        NewAlternativeDTO java = new NewAlternativeDTO();
+        NewAlternativeDTO spring = new NewAlternativeDTO();
+        NewAlternativeDTO docker = new NewAlternativeDTO();
+        NewAlternativeDTO elk = new NewAlternativeDTO();
+        NewAlternativeDTO aws = new NewAlternativeDTO();
+        NewAlternativeDTO oci = new NewAlternativeDTO();
+
+        java.setOption("Java 21");
+        spring.setOption("Spring");
+        docker.setOption("Docker");
+        elk.setOption("ElasticSearch, Kibana e Logstash");
+        aws.setOption("Amazon Web Services");
+        oci.setOption("Oracle Cloud Infrastructure");
+
+        java.setCorrect();
+        spring.setCorrect();
+        docker.setIncorrect();
+        elk.setIncorrect();
+        aws.setIncorrect();
+        oci.setIncorrect();
+
+        newMultipleChoiceTaskDTO.setOptions(List.of(docker, java, spring, elk, aws, oci));
+
+        doReturn(Optional.of(course)).when(courseRepository).findById(newMultipleChoiceTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+
+        mockMvc.perform(post("/task/new/multiplechoice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newMultipleChoiceTaskDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].field")
+                        .value("options"))
+                .andExpect(jsonPath("$[0].message")
+                        .isNotEmpty());
+    }
+
+    @Test
+    void newMultipleChoice__should_return_bad_request_when_task_has_not_incorrect_alternative() throws Exception {
+        Course course = mock(Course.class);
+        NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO = new NewMultipleChoiceTaskDTO();
+        newMultipleChoiceTaskDTO.setCourseId(course.getId());
+        newMultipleChoiceTaskDTO.setOrder(1);
+        newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
+
+        NewAlternativeDTO tdd = new NewAlternativeDTO();
+        NewAlternativeDTO junit = new NewAlternativeDTO();
+        NewAlternativeDTO mockito = new NewAlternativeDTO();
+
+        tdd.setOption("Desenvolvimento orientado a testes");
+        junit.setOption("JUnit 5");
+        mockito.setOption("Mockito");
+
+        tdd.setCorrect();
+        junit.setCorrect();
+        mockito.setCorrect();
+
+        newMultipleChoiceTaskDTO.setOptions(List.of(tdd, junit, mockito));
+
+        doReturn(Optional.of(course)).when(courseRepository).findById(newMultipleChoiceTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+
+        mockMvc.perform(post("/task/new/multiplechoice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newMultipleChoiceTaskDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.field")
+                        .value("options"))
+                .andExpect(jsonPath("$.message")
+                        .isNotEmpty());
+    }
+
+    @Test
+    void newMultipleChoice__should_return_bad_request_when_task_has_alternatives_with_same_options() throws Exception {
+        Course course = mock(Course.class);
+        NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO = new NewMultipleChoiceTaskDTO();
+        newMultipleChoiceTaskDTO.setCourseId(course.getId());
+        newMultipleChoiceTaskDTO.setOrder(1);
+        newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
+
+        NewAlternativeDTO solid = new NewAlternativeDTO();
+        NewAlternativeDTO duplicatedSolid = new NewAlternativeDTO();
+        NewAlternativeDTO otherDuplicatedSolid = new NewAlternativeDTO();
+
+        solid.setOption("Solid");
+        duplicatedSolid.setOption(solid.getOption());
+        otherDuplicatedSolid.setOption(solid.getOption());
+
+        solid.setCorrect();
+        duplicatedSolid.setCorrect();
+        otherDuplicatedSolid.setIncorrect();
+
+        newMultipleChoiceTaskDTO.setOptions(List.of(solid, duplicatedSolid, otherDuplicatedSolid));
+        doReturn(Optional.of(course)).when(courseRepository).findById(newMultipleChoiceTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+
+        mockMvc.perform(post("/task/new/multiplechoice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newMultipleChoiceTaskDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.field")
+                        .value("options"))
+                .andExpect(jsonPath("$.message")
+                        .isNotEmpty());
+    }
+
+    @Test
+    void newMultipleChoice__should_return_bad_request_when_task_has_alternatives_with_options_equals_to_statement() throws Exception {
+        Course course = mock(Course.class);
+        NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO = new NewMultipleChoiceTaskDTO();
+        newMultipleChoiceTaskDTO.setCourseId(course.getId());
+        newMultipleChoiceTaskDTO.setOrder(1);
+        newMultipleChoiceTaskDTO.setStatement("Fazer deploy com Github Actions");
+
+        NewAlternativeDTO deploy = new NewAlternativeDTO();
+        NewAlternativeDTO codeReview = new NewAlternativeDTO();
+        NewAlternativeDTO pairProgramming = new NewAlternativeDTO();
+
+        deploy.setOption("Fazer deploy com Github Actions");
+        codeReview.setOption("Code review");
+        pairProgramming.setOption("Pair programming");
+
+        deploy.setCorrect();
+        codeReview.setIncorrect();
+        pairProgramming.setCorrect();
+
+        newMultipleChoiceTaskDTO.setOptions(List.of(deploy, codeReview, pairProgramming));
+        doReturn(Optional.of(course)).when(courseRepository).findById(newMultipleChoiceTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+
+        mockMvc.perform(post("/task/new/multiplechoice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newMultipleChoiceTaskDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.field")
+                        .value("options"))
+                .andExpect(jsonPath("$.message")
+                        .isNotEmpty());
+    }
+
+    @Test
+    void newMultipleChoice__should_return_created_when_task_is_valid() throws Exception {
+        Course course = mock(Course.class);
+        NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO = new NewMultipleChoiceTaskDTO();
+        newMultipleChoiceTaskDTO.setCourseId(course.getId());
+        newMultipleChoiceTaskDTO.setOrder(1);
+        newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
+
+        NewAlternativeDTO tdd = new NewAlternativeDTO();
+        NewAlternativeDTO rabbitMQ = new NewAlternativeDTO();
+        NewAlternativeDTO eda = new NewAlternativeDTO();
+        NewAlternativeDTO springSecurity = new NewAlternativeDTO();
+        NewAlternativeDTO springCloud = new NewAlternativeDTO();
+
+        tdd.setOption("Desenvolvimento orientado a testes");
+        rabbitMQ.setOption("RabbitMQ");
+        eda.setOption("Arquitetura orientada a eventos");
+        springSecurity.setOption("Spring Security");
+        springCloud.setOption("Spring Cloud");
+
+        rabbitMQ.setCorrect();
+        eda.setCorrect();
+        tdd.setIncorrect();
+        springSecurity.setIncorrect();
+        springCloud.setIncorrect();
+
+        newMultipleChoiceTaskDTO.setOptions(List.of(tdd, rabbitMQ, eda, springSecurity, springCloud));
+        doReturn(Optional.of(course)).when(courseRepository).findById(newMultipleChoiceTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+        doReturn(false).when(taskRepository).existsTasksByCourseIdAndByStatement(
+                newMultipleChoiceTaskDTO.getCourseId(),
+                newMultipleChoiceTaskDTO.getStatement()
+        );
+        doReturn(null).when(taskRepository).findHighestOrderByCourseId(newMultipleChoiceTaskDTO.getCourseId());
+
+        mockMvc.perform(post("/task/new/multiplechoice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newMultipleChoiceTaskDTO)))
+                .andExpect(status().isCreated());
+
+        verify(taskRepository, times(1)).save(any(Task.class));
+    }
 }
