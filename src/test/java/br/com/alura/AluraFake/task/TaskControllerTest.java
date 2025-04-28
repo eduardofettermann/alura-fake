@@ -444,6 +444,8 @@ public class TaskControllerTest {
         apiRest.setCorrect();
         bestPractices.setCorrect();
 
+        newSingleChoiceTaskDTO.setOptions(List.of(apiRest, bestPractices));
+
         doReturn(Optional.of(course)).when(courseRepository).findById(newSingleChoiceTaskDTO.getCourseId());
         doReturn(true).when(course).isBuilding();
 
@@ -451,9 +453,9 @@ public class TaskControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newSingleChoiceTaskDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$[0].field")
+                .andExpect(jsonPath("$.field")
                         .value("options"))
-                .andExpect(jsonPath("$[0].message")
+                .andExpect(jsonPath("$.message")
                         .isNotEmpty());
     }
 }
