@@ -1,5 +1,6 @@
 package br.com.alura.AluraFake.alternative;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +28,11 @@ public class NewAlternativeDTO {
     @JsonProperty("isCorrect")
     public Boolean isCorrect() {
         return isCorrect;
+    }
+
+    @JsonIgnore
+    public Boolean isIncorrect() {
+        return !isCorrect;
     }
 
     public void setCorrect() {
