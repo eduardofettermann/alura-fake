@@ -30,24 +30,24 @@ public class TaskController {
 
     @PostMapping("/task/new/opentext")
     @Transactional
-    public ResponseEntity newOpenTextExercise(@RequestBody @Valid NewTaskDTO newTaskDTO) {
-        Optional<Course> possibleCourse = courseRepository.findById(newTaskDTO.getCourseId());
+    public ResponseEntity newOpenTextExercise(@RequestBody @Valid NewOpenTextTaskDTO newOpenTextTaskDTO) {
+        Optional<Course> possibleCourse = courseRepository.findById(newOpenTextTaskDTO.getCourseId());
         Optional<ResponseEntity<ErrorItemDTO>> possibleCourseErrorItemDTOResponse = validateCourseByCourseId(
                 possibleCourse,
-                newTaskDTO.getCourseId()
+                newOpenTextTaskDTO.getCourseId()
         );
 
         if (possibleCourseErrorItemDTOResponse.isPresent()) {
             return possibleCourseErrorItemDTOResponse.get();
         }
 
-        Optional<ResponseEntity<ErrorItemDTO>> possibleTaskErrorItemDTOResponse = validateTask(newTaskDTO);
+        Optional<ResponseEntity<ErrorItemDTO>> possibleTaskErrorItemDTOResponse = validateTask(newOpenTextTaskDTO);
 
         if (possibleTaskErrorItemDTOResponse.isPresent()) {
             return possibleTaskErrorItemDTOResponse.get();
         }
 
-        Task task = new Task(possibleCourse.get(), Type.OPEN_TEXT, newTaskDTO.getOrder(), newTaskDTO.getStatement());
+        Task task = new Task(possibleCourse.get(), Type.OPEN_TEXT, newOpenTextTaskDTO.getOrder(), newOpenTextTaskDTO.getStatement());
         taskRepository.save(task);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
