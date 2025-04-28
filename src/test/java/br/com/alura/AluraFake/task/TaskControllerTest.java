@@ -1,12 +1,10 @@
 package br.com.alura.AluraFake.task;
 
-import br.com.alura.AluraFake.alternative.AlternativeRepository;
 import br.com.alura.AluraFake.alternative.NewAlternativeDTO;
 import br.com.alura.AluraFake.course.Course;
 import br.com.alura.AluraFake.course.CourseRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -299,6 +297,40 @@ public class TaskControllerTest {
         NewAlternativeDTO alternativeWithOptionInvalid = new NewAlternativeDTO();
         alternativeWithOptionInvalid.setCorrect();
         alternativeWithOptionInvalid.setOption("123");
+        NewAlternativeDTO java = new NewAlternativeDTO();
+        NewAlternativeDTO spring = new NewAlternativeDTO();
+        java.setOption("Java 21");
+        spring.setOption("Spring");
+        java.setIncorrect();
+        spring.setIncorrect();
+
+        newSingleChoiceTaskDTO.setOptions(List.of(alternativeWithOptionInvalid, java, spring));
+
+        doReturn(Optional.of(course)).when(courseRepository).findById(newSingleChoiceTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+
+        mockMvc.perform(post("/task/new/singlechoice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newSingleChoiceTaskDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].field")
+                        .value("options[0].option"))
+                .andExpect(jsonPath("$[0].message")
+                        .isNotEmpty());
+    }
+
+    @Test
+    void newSingleChoice__should_return_bad_request_when_any_option_length_is_greater_than_80() throws Exception {
+        Course course = mock(Course.class);
+        NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
+        newSingleChoiceTaskDTO.setCourseId(course.getId());
+        newSingleChoiceTaskDTO.setType(Type.SINGLE_CHOICE);
+        newSingleChoiceTaskDTO.setOrder(1);
+        newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
+
+        NewAlternativeDTO alternativeWithOptionInvalid = new NewAlternativeDTO();
+        alternativeWithOptionInvalid.setCorrect();
+        alternativeWithOptionInvalid.setOption("fiap".repeat(21));
         NewAlternativeDTO java = new NewAlternativeDTO();
         NewAlternativeDTO spring = new NewAlternativeDTO();
         java.setOption("Java 21");
