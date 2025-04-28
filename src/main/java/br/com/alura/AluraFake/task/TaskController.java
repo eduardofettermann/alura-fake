@@ -78,6 +78,20 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/task/new/multiplechoice")
+    public ResponseEntity newMultipleChoice() {
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("task/all")
+    public ResponseEntity<List<TaskListItemDTO>> listAllTasksByCourseIdOrderByOrder() {
+        List<TaskListItemDTO> tasks = taskRepository.findAll().stream()
+                .map(TaskListItemDTO::new)
+                .toList();
+
+        return ResponseEntity.ok(tasks);
+    }
+
     private Optional<ResponseEntity<ErrorItemDTO>> validateSingleChoice(@Valid NewSingleChoiceTaskDTO newSingleChoiceTaskDTO) {
         List<NewAlternativeDTO> options = newSingleChoiceTaskDTO.getOptions();
         boolean hasMoreOneCorrectAlternative = options.stream()
@@ -100,20 +114,6 @@ public class TaskController {
         }
 
         return Optional.empty();
-    }
-
-    @PostMapping("/task/new/multiplechoice")
-    public ResponseEntity newMultipleChoice() {
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("task/all")
-    public ResponseEntity<List<TaskListItemDTO>> listAllTasksByCourseIdOrderByOrder() {
-        List<TaskListItemDTO> tasks = taskRepository.findAll().stream()
-                .map(TaskListItemDTO::new)
-                .toList();
-
-        return ResponseEntity.ok(tasks);
     }
 
     private Optional<ResponseEntity<ErrorItemDTO>> validateTask(NewTaskDTO newTaskDTO) {
