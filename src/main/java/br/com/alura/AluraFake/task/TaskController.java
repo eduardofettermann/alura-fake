@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -93,6 +94,7 @@ public class TaskController {
     }
 
     private Optional<ResponseEntity<ErrorItemDTO>> validateSingleChoice(@Valid NewSingleChoiceTaskDTO newSingleChoiceTaskDTO) {
+        String optionsField = "options";
         List<NewAlternativeDTO> options = newSingleChoiceTaskDTO.getOptions();
         boolean hasMoreOneCorrectAlternative = options.stream()
                 .filter(NewAlternativeDTO::isCorrect)
@@ -100,7 +102,7 @@ public class TaskController {
 
         if (hasMoreOneCorrectAlternative) {
             return buildErrorResponse(
-                    "options",
+                    optionsField,
                     "A atividade deve ter apenas uma única alternativa correta.",
                     HttpStatus.BAD_REQUEST);
         }
@@ -110,7 +112,17 @@ public class TaskController {
                 .collect(Collectors.toSet());
 
         if (options.size() != optionsWithoutRepetition.size()) {
-            return buildErrorResponse("options", "As alternativas não podem ser iguais entre si", HttpStatus.BAD_REQUEST);
+            return buildErrorResponse(optionsField, "As alternativas não podem ser iguais entre si", HttpStatus.BAD_REQUEST);
+        }
+
+        String statement = newSingleChoiceTaskDTO.getStatement();
+        boolean someOptionIsEqualToStatement = options.stream()
+                .anyMatch(option -> Objects.equals(option.getOption(), statement));
+
+        if (someOptionIsEqualToStatement) {
+            return buildErrorResponse(optionsField,
+                    "As alternativas não podem ser iguais ao enunciado da atividade.",
+                    HttpStatus.BAD_REQUEST);
         }
 
         return Optional.empty();
