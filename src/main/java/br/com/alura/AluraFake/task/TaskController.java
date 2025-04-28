@@ -1,5 +1,6 @@
 package br.com.alura.AluraFake.task;
 
+import br.com.alura.AluraFake.alternative.NewAlternativeDTO;
 import br.com.alura.AluraFake.course.Course;
 import br.com.alura.AluraFake.course.CourseRepository;
 import br.com.alura.AluraFake.util.ErrorItemDTO;
@@ -67,7 +68,27 @@ public class TaskController {
             return possibleTaskErrorItemDTOResponse.get();
         }
 
+        Optional<ResponseEntity<ErrorItemDTO>> possibleOptionsErrorItemDTOResponse = validateSingleChoice(newSingleChoiceTaskDTO);
+        if (possibleOptionsErrorItemDTOResponse.isPresent()) {
+            return possibleOptionsErrorItemDTOResponse.get();
+        }
+
         return ResponseEntity.ok().build();
+    }
+
+    private Optional<ResponseEntity<ErrorItemDTO>> validateSingleChoice(@Valid NewSingleChoiceTaskDTO newSingleChoiceTaskDTO) {
+        boolean hasMoreOneCorrectAlternative = newSingleChoiceTaskDTO.getOptions().stream()
+                .filter(NewAlternativeDTO::isCorrect)
+                .count() > 1;
+
+        if (hasMoreOneCorrectAlternative) {
+            return Optional.of(buildErrorResponse(
+                    "options",
+                    "A atividade deve ter apenas uma única alternativa correta.",
+                    HttpStatus.BAD_REQUEST));
+        }
+
+        return Optional.empty();
     }
 
     @PostMapping("/task/new/multiplechoice")
