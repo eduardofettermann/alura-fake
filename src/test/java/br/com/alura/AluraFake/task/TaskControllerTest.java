@@ -522,4 +522,39 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.message")
                         .isNotEmpty());
     }
+
+    @Test
+    void newSingleChoice__should_return_created_when_task_is_valid() throws Exception {
+        Course course = mock(Course.class);
+        NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
+        newSingleChoiceTaskDTO.setCourseId(course.getId());
+        newSingleChoiceTaskDTO.setType(Type.SINGLE_CHOICE);
+        newSingleChoiceTaskDTO.setOrder(1);
+        newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
+
+        NewAlternativeDTO tdd = new NewAlternativeDTO();
+        NewAlternativeDTO rabbitMQ = new NewAlternativeDTO();
+
+        tdd.setOption("Desenvolvimento orientado a testes");
+        rabbitMQ.setOption("RabbitMQ");
+
+        tdd.setCorrect();
+        rabbitMQ.setIncorrect();
+
+        newSingleChoiceTaskDTO.setOptions(List.of(tdd, rabbitMQ));
+        doReturn(Optional.of(course)).when(courseRepository).findById(newSingleChoiceTaskDTO.getCourseId());
+        doReturn(true).when(course).isBuilding();
+        doReturn(false).when(taskRepository).existsTasksByCourseIdAndByStatement(
+                newSingleChoiceTaskDTO.getCourseId(),
+                newSingleChoiceTaskDTO.getStatement()
+        );
+        doReturn(null).when(taskRepository).findHighestOrderByCourseId(newSingleChoiceTaskDTO.getCourseId());
+
+        mockMvc.perform(post("/task/new/singlechoice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newSingleChoiceTaskDTO)))
+                .andExpect(status().isCreated());
+
+        verify(taskRepository, times(1)).save(any(Task.class));
+    }
 }
