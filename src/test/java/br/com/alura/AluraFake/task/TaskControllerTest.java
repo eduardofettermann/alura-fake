@@ -257,25 +257,6 @@ public class TaskControllerTest {
     }
 
     @Test
-    void listAllTasks__should_list_all_tasks() throws Exception {
-        Course course = mock(Course.class);
-        Task kissTask = new Task(course, Type.OPEN_TEXT, 1, "Explique o que é KISS e as vantagens de sua utilização.");
-        Task yagniTask = new Task(course, Type.OPEN_TEXT, 2, "Explique o que é YAGNI e as vantagens da sua utilização.");
-        Task dryTask = new Task(course, Type.OPEN_TEXT, 3, "Explique o que é DRY e as vantagens da sua utilização.");
-
-        doReturn(true).when(course).isBuilding();
-
-        when(taskRepository.findAll()).thenReturn(Arrays.asList(yagniTask, kissTask, dryTask));
-
-        mockMvc.perform(get("/task/all")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].statement").value(yagniTask.getStatement()))
-                .andExpect(jsonPath("$[1].statement").value(kissTask.getStatement()))
-                .andExpect(jsonPath("$[2].statement").value(dryTask.getStatement()));
-    }
-
-    @Test
     void newSingleChoice__should_return_bad_request_when_any_option_length_is_smaller_than_4() throws Exception {
         Course course = mock(Course.class);
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
@@ -830,5 +811,24 @@ public class TaskControllerTest {
                 .andExpect(status().isCreated());
 
         verify(taskRepository, times(1)).save(any(Task.class));
+    }
+
+    @Test
+    void listAllTasks__should_list_all_tasks() throws Exception {
+        Course course = mock(Course.class);
+        Task kissTask = new Task(course, Type.OPEN_TEXT, 1, "Explique o que é KISS e as vantagens de sua utilização.");
+        Task yagniTask = new Task(course, Type.OPEN_TEXT, 2, "Explique o que é YAGNI e as vantagens da sua utilização.");
+        Task dryTask = new Task(course, Type.OPEN_TEXT, 3, "Explique o que é DRY e as vantagens da sua utilização.");
+
+        doReturn(true).when(course).isBuilding();
+
+        when(taskRepository.findAll()).thenReturn(Arrays.asList(yagniTask, kissTask, dryTask));
+
+        mockMvc.perform(get("/task/all")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].statement").value(yagniTask.getStatement()))
+                .andExpect(jsonPath("$[1].statement").value(kissTask.getStatement()))
+                .andExpect(jsonPath("$[2].statement").value(dryTask.getStatement()));
     }
 }
