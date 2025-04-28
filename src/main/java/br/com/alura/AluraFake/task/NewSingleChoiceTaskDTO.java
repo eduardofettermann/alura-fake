@@ -20,4 +20,9 @@ public class NewSingleChoiceTaskDTO extends NewTaskDTO {
     public void setOptions(List<NewAlternativeDTO> options) {
         this.options = options;
     }
+
+    @Override
+    public Type getType() {
+        return Type.SINGLE_CHOICE;
+    }
 }
