@@ -93,8 +93,44 @@ public class TaskController {
     }
 
     @PostMapping("/task/new/multiplechoice")
-    public ResponseEntity newMultipleChoice() {
-        return ResponseEntity.ok().build();
+    @Transactional
+    public ResponseEntity newMultipleChoice(@RequestBody @Valid NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO) {
+        Optional<Course> possibleCourse = courseRepository.findById(newMultipleChoiceTaskDTO.getCourseId());
+        Optional<ResponseEntity<ErrorItemDTO>> possibleCourseErrorItemDTOResponse = validateCourseByCourseId(
+                possibleCourse,
+                newMultipleChoiceTaskDTO.getCourseId()
+        );
+
+        if (possibleCourseErrorItemDTOResponse.isPresent()) {
+            return possibleCourseErrorItemDTOResponse.get();
+        }
+
+        Optional<ResponseEntity<ErrorItemDTO>> possibleTaskErrorItemDTOResponse = validateTask(newMultipleChoiceTaskDTO);
+
+        if (possibleTaskErrorItemDTOResponse.isPresent()) {
+            return possibleTaskErrorItemDTOResponse.get();
+        }
+
+        Optional<ResponseEntity<ErrorItemDTO>> possibleOptionsErrorItemDTOResponse = validateMultipleChoice(newMultipleChoiceTaskDTO);
+        if (possibleOptionsErrorItemDTOResponse.isPresent()) {
+            return possibleOptionsErrorItemDTOResponse.get();
+        }
+
+        Task task = new Task(
+                possibleCourse.get(),
+                Type.MULTIPLE_CHOICE,
+                newMultipleChoiceTaskDTO.getOrder(),
+                newMultipleChoiceTaskDTO.getStatement()
+        );
+
+        List<Alternative> alternatives = newMultipleChoiceTaskDTO.getOptions().stream()
+                .map(option -> new Alternative(task, option.getOption(), option.isCorrect()))
+                .toList();
+        task.setAlternatives(alternatives);
+
+        taskRepository.save(task);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("task/all")
@@ -129,6 +165,50 @@ public class TaskController {
         }
 
         String statement = newSingleChoiceTaskDTO.getStatement();
+        boolean someOptionIsEqualToStatement = options.stream()
+                .anyMatch(option -> Objects.equals(option.getOption(), statement));
+
+        if (someOptionIsEqualToStatement) {
+            return buildErrorResponse(optionsField,
+                    "As alternativas não podem ser iguais ao enunciado da atividade.",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<ResponseEntity<ErrorItemDTO>> validateMultipleChoice(@Valid NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO) {
+        String optionsField = "options";
+        List<NewAlternativeDTO> options = newMultipleChoiceTaskDTO.getOptions();
+
+        boolean hasMoreOneCorrectAlternative = options.stream()
+                .filter(NewAlternativeDTO::isCorrect)
+                .count() > 1;
+        if (!hasMoreOneCorrectAlternative) {
+            return buildErrorResponse(
+                    optionsField,
+                    "A atividade deve ter duas ou mais alternativas corretas, e ao menos uma alternativa incorreta",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        boolean hasOneIncorrectAlternative = options.stream()
+                .anyMatch(NewAlternativeDTO::isIncorrect);
+        if (!hasOneIncorrectAlternative) {
+            return buildErrorResponse(
+                    optionsField,
+                    "A atividade deve ter duas ou mais alternativas corretas, e ao menos uma alternativa incorreta",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        Set<String> optionsWithoutRepetition = options.stream()
+                .map(NewAlternativeDTO::getOption)
+                .collect(Collectors.toSet());
+
+        if (options.size() != optionsWithoutRepetition.size()) {
+            return buildErrorResponse(optionsField, "As alternativas não podem ser iguais entre si", HttpStatus.BAD_REQUEST);
+        }
+
+        String statement = newMultipleChoiceTaskDTO.getStatement();
         boolean someOptionIsEqualToStatement = options.stream()
                 .anyMatch(option -> Objects.equals(option.getOption(), statement));
 
