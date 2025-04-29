@@ -1,9 +1,9 @@
 package br.com.alura.AluraFake.user;
 
+import br.com.alura.AluraFake.exception.domain.DuplicateUserEmailException;
 import br.com.alura.AluraFake.user.dto.NewUserDTO;
 import br.com.alura.AluraFake.user.dto.UserListItemDTO;
 import br.com.alura.AluraFake.user.model.User;
-import br.com.alura.AluraFake.util.ErrorItemDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,9 +24,9 @@ public class UserController {
     @PostMapping("/user/new")
     public ResponseEntity newStudent(@RequestBody @Valid NewUserDTO newUser) {
         if(userRepository.existsByEmail(newUser.email())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorItemDTO("email", "Email já cadastrado no sistema"));
+            throw new DuplicateUserEmailException("email");
         }
+
         User user = newUser.toModel();
         userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();

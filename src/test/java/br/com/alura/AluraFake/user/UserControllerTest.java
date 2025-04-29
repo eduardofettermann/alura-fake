@@ -62,9 +62,9 @@ class UserControllerTest {
         mockMvc.perform(post("/user/new")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUserDTO)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.field").value("email"))
-                .andExpect(jsonPath("$.message").value("Email já cadastrado no sistema"));
+                .andExpect(jsonPath("$.message").value("Email de usuário já cadastrado no sistema"));
     }
 
     @Test
