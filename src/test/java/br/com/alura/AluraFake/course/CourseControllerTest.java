@@ -157,4 +157,19 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$.field").value("status"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
+
+    @Test
+    void publishCourse__should_return_ok_when_course_is_valid_to_publish() throws Exception {
+        Course mockedCourse =  mock(Course.class);
+        Long mockedCourseId = 1L;
+
+        doReturn(Optional.of(mockedCourse)).when(courseRepository).findById(mockedCourseId);
+        doReturn(true).when(taskRepository).existsAtLeatOneTaskOfEachTypeByCourseId(mockedCourseId);
+        doReturn(true).when(mockedCourse).isBuilding();
+
+        mockMvc.perform(post("/course/".concat(mockedCourseId.toString()).concat("/publish")))
+                .andExpect(status().isOk());
+
+        verify(courseRepository, times(1)).save(any(Course.class));
+    }
 }
