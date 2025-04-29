@@ -4,10 +4,10 @@ import br.com.alura.AluraFake.alternative.model.Alternative;
 import br.com.alura.AluraFake.alternative.dto.NewAlternativeDTO;
 import br.com.alura.AluraFake.course.model.Course;
 import br.com.alura.AluraFake.course.CourseRepository;
+import br.com.alura.AluraFake.exception.domain.*;
 import br.com.alura.AluraFake.task.dto.*;
 import br.com.alura.AluraFake.task.model.Task;
 import br.com.alura.AluraFake.task.model.TaskType;
-import br.com.alura.AluraFake.util.ErrorItemDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,20 +33,9 @@ public class TaskController {
     @Transactional
     public ResponseEntity newOpenTextExercise(@RequestBody @Valid NewOpenTextTaskDTO newOpenTextTaskDTO) {
         Optional<Course> possibleCourse = courseRepository.findById(newOpenTextTaskDTO.getCourseId());
-        Optional<ResponseEntity<ErrorItemDTO>> possibleCourseErrorItemDTOResponse = validateCourseByCourseId(
-                possibleCourse,
-                newOpenTextTaskDTO.getCourseId()
-        );
 
-        if (possibleCourseErrorItemDTOResponse.isPresent()) {
-            return possibleCourseErrorItemDTOResponse.get();
-        }
-
-        Optional<ResponseEntity<ErrorItemDTO>> possibleTaskErrorItemDTOResponse = validateTask(newOpenTextTaskDTO);
-
-        if (possibleTaskErrorItemDTOResponse.isPresent()) {
-            return possibleTaskErrorItemDTOResponse.get();
-        }
+        validateCourseByCourseId(possibleCourse, newOpenTextTaskDTO.getCourseId());
+        validateTask(newOpenTextTaskDTO);
 
         Task task = new Task(possibleCourse.get(), TaskType.OPEN_TEXT, newOpenTextTaskDTO.getOrder(), newOpenTextTaskDTO.getStatement());
         taskRepository.save(task);
@@ -58,25 +47,10 @@ public class TaskController {
     @Transactional
     public ResponseEntity newSingleChoice(@RequestBody @Valid NewSingleChoiceTaskDTO newSingleChoiceTaskDTO) {
         Optional<Course> possibleCourse = courseRepository.findById(newSingleChoiceTaskDTO.getCourseId());
-        Optional<ResponseEntity<ErrorItemDTO>> possibleCourseErrorItemDTOResponse = validateCourseByCourseId(
-                possibleCourse,
-                newSingleChoiceTaskDTO.getCourseId()
-        );
 
-        if (possibleCourseErrorItemDTOResponse.isPresent()) {
-            return possibleCourseErrorItemDTOResponse.get();
-        }
-
-        Optional<ResponseEntity<ErrorItemDTO>> possibleTaskErrorItemDTOResponse = validateTask(newSingleChoiceTaskDTO);
-
-        if (possibleTaskErrorItemDTOResponse.isPresent()) {
-            return possibleTaskErrorItemDTOResponse.get();
-        }
-
-        Optional<ResponseEntity<ErrorItemDTO>> possibleOptionsErrorItemDTOResponse = validateSingleChoice(newSingleChoiceTaskDTO);
-        if (possibleOptionsErrorItemDTOResponse.isPresent()) {
-            return possibleOptionsErrorItemDTOResponse.get();
-        }
+        validateCourseByCourseId(possibleCourse, newSingleChoiceTaskDTO.getCourseId());
+        validateTask(newSingleChoiceTaskDTO);
+        validateSingleChoice(newSingleChoiceTaskDTO);
 
         Task task = new Task(
                 possibleCourse.get(),
@@ -99,25 +73,10 @@ public class TaskController {
     @Transactional
     public ResponseEntity newMultipleChoice(@RequestBody @Valid NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO) {
         Optional<Course> possibleCourse = courseRepository.findById(newMultipleChoiceTaskDTO.getCourseId());
-        Optional<ResponseEntity<ErrorItemDTO>> possibleCourseErrorItemDTOResponse = validateCourseByCourseId(
-                possibleCourse,
-                newMultipleChoiceTaskDTO.getCourseId()
-        );
 
-        if (possibleCourseErrorItemDTOResponse.isPresent()) {
-            return possibleCourseErrorItemDTOResponse.get();
-        }
-
-        Optional<ResponseEntity<ErrorItemDTO>> possibleTaskErrorItemDTOResponse = validateTask(newMultipleChoiceTaskDTO);
-
-        if (possibleTaskErrorItemDTOResponse.isPresent()) {
-            return possibleTaskErrorItemDTOResponse.get();
-        }
-
-        Optional<ResponseEntity<ErrorItemDTO>> possibleOptionsErrorItemDTOResponse = validateMultipleChoice(newMultipleChoiceTaskDTO);
-        if (possibleOptionsErrorItemDTOResponse.isPresent()) {
-            return possibleOptionsErrorItemDTOResponse.get();
-        }
+        validateCourseByCourseId(possibleCourse, newMultipleChoiceTaskDTO.getCourseId());
+        validateTask(newMultipleChoiceTaskDTO);
+        validateMultipleChoice(newMultipleChoiceTaskDTO);
 
         Task task = new Task(
                 possibleCourse.get(),
@@ -145,7 +104,7 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
-    private Optional<ResponseEntity<ErrorItemDTO>> validateSingleChoice(@Valid NewSingleChoiceTaskDTO newSingleChoiceTaskDTO) {
+    private void validateSingleChoice(@Valid NewSingleChoiceTaskDTO newSingleChoiceTaskDTO) {
         String optionsField = "options";
         List<NewAlternativeDTO> options = newSingleChoiceTaskDTO.getOptions();
         boolean hasMoreOneCorrectAlternative = options.stream()
@@ -153,10 +112,7 @@ public class TaskController {
                 .count() > 1;
 
         if (hasMoreOneCorrectAlternative) {
-            return buildErrorResponse(
-                    optionsField,
-                    "A atividade deve ter apenas uma única alternativa correta.",
-                    HttpStatus.BAD_REQUEST);
+            throw new InvalidCorrectOrIncorrectAlternativesException("options", "A atividade deve ter apenas uma única alternativa correta.");
         }
 
         Set<String> optionsWithoutRepetition = options.stream()
@@ -164,7 +120,7 @@ public class TaskController {
                 .collect(Collectors.toSet());
 
         if (options.size() != optionsWithoutRepetition.size()) {
-            return buildErrorResponse(optionsField, "As alternativas não podem ser iguais entre si", HttpStatus.BAD_REQUEST);
+            throw new AlternativeOptionsMustBeUniqueException(optionsField);
         }
 
         String statement = newSingleChoiceTaskDTO.getStatement();
@@ -172,15 +128,11 @@ public class TaskController {
                 .anyMatch(option -> Objects.equals(option.option(), statement));
 
         if (someOptionIsEqualToStatement) {
-            return buildErrorResponse(optionsField,
-                    "As alternativas não podem ser iguais ao enunciado da atividade.",
-                    HttpStatus.BAD_REQUEST);
+            throw new AlternativeOptionEqualsTaskStatementException(optionsField);
         }
-
-        return Optional.empty();
     }
 
-    private Optional<ResponseEntity<ErrorItemDTO>> validateMultipleChoice(@Valid NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO) {
+    private void validateMultipleChoice(@Valid NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO) {
         String optionsField = "options";
         List<NewAlternativeDTO> options = newMultipleChoiceTaskDTO.getOptions();
 
@@ -188,19 +140,13 @@ public class TaskController {
                 .filter(NewAlternativeDTO::isCorrect)
                 .count() > 1;
         if (!hasMoreOneCorrectAlternative) {
-            return buildErrorResponse(
-                    optionsField,
-                    "A atividade deve ter duas ou mais alternativas corretas, e ao menos uma alternativa incorreta",
-                    HttpStatus.BAD_REQUEST);
+            throw new InvalidCorrectOrIncorrectAlternativesException(optionsField, "A atividade deve ter duas ou mais alternativas corretas, e ao menos uma alternativa incorreta");
         }
 
         boolean hasOneIncorrectAlternative = options.stream()
                 .anyMatch(NewAlternativeDTO::isIncorrect);
         if (!hasOneIncorrectAlternative) {
-            return buildErrorResponse(
-                    optionsField,
-                    "A atividade deve ter duas ou mais alternativas corretas, e ao menos uma alternativa incorreta",
-                    HttpStatus.BAD_REQUEST);
+            throw new InvalidCorrectOrIncorrectAlternativesException(optionsField, "A atividade deve ter duas ou mais alternativas corretas, e ao menos uma alternativa incorreta");
         }
 
         Set<String> optionsWithoutRepetition = options.stream()
@@ -208,7 +154,7 @@ public class TaskController {
                 .collect(Collectors.toSet());
 
         if (options.size() != optionsWithoutRepetition.size()) {
-            return buildErrorResponse(optionsField, "As alternativas não podem ser iguais entre si", HttpStatus.BAD_REQUEST);
+            throw new AlternativeOptionsMustBeUniqueException(optionsField);
         }
 
         String statement = newMultipleChoiceTaskDTO.getStatement();
@@ -216,29 +162,25 @@ public class TaskController {
                 .anyMatch(option -> Objects.equals(option.option(), statement));
 
         if (someOptionIsEqualToStatement) {
-            return buildErrorResponse(optionsField,
-                    "As alternativas não podem ser iguais ao enunciado da atividade.",
-                    HttpStatus.BAD_REQUEST);
+            throw new AlternativeOptionEqualsTaskStatementException(optionsField);
         }
-
-        return Optional.empty();
     }
 
-    private Optional<ResponseEntity<ErrorItemDTO>> validateTask(NewTaskDTO newTaskDTO) {
+    private void validateTask(NewTaskDTO newTaskDTO) {
         if (taskRepository.existsTasksByCourseIdAndByStatement(newTaskDTO.getCourseId(), newTaskDTO.getStatement())) {
             String message = String.format("Já existe uma tarefa com o enunciado '%s' vinculado ao curso com ID %d",
                     newTaskDTO.getStatement(), newTaskDTO.getCourseId());
-            return buildErrorResponse("statement", message, HttpStatus.BAD_REQUEST);
+            throw new DuplicateTaskStatementInException("statement", message);
         }
 
-        return validateOrder(newTaskDTO);
+        validateOrder(newTaskDTO);
     }
 
-    private Optional<ResponseEntity<ErrorItemDTO>> validateOrder(NewTaskDTO newTaskDTO) {
+    private void validateOrder(NewTaskDTO newTaskDTO) {
         Integer highestOrder = taskRepository.findHighestOrderByCourseId(newTaskDTO.getCourseId());
 
         if (highestOrder == null && newTaskDTO.getOrder() != 1) {
-            return buildErrorResponse("order", "A ordem inserida está fora de sequência", HttpStatus.BAD_REQUEST);
+            throw new OutOfSequenceTaskOrderException("order", "A ordem inserida está fora de sequência");
         }
 
         if (highestOrder != null) {
@@ -246,15 +188,13 @@ public class TaskController {
             int newOrder = newTaskDTO.getOrder();
 
             if (newOrder > expectedNextOrder) {
-                return buildErrorResponse("order", "A ordem inserida está fora de sequência", HttpStatus.BAD_REQUEST);
+                throw new OutOfSequenceTaskOrderException("order", "A ordem inserida está fora de sequência");
             }
 
             if (taskRepository.existsTasksByCourseIdAndByOrder(newTaskDTO.getCourseId(), newOrder)) {
                 reorderTasks(newTaskDTO);
             }
         }
-
-        return Optional.empty();
     }
 
     private void reorderTasks(NewTaskDTO newTaskDTO) {
@@ -267,21 +207,15 @@ public class TaskController {
         taskRepository.saveAll(tasksToReorder);
     }
 
-    private Optional<ResponseEntity<ErrorItemDTO>> validateCourseByCourseId(Optional<Course> possibleCourse, Long courseId) {
+    private void validateCourseByCourseId(Optional<Course> possibleCourse, Long courseId) {
         if (possibleCourse.isEmpty()) {
             String message = String.format("Um curso com o ID %d não foi encontrado.", courseId);
-            return buildErrorResponse("courseId", message, HttpStatus.NOT_FOUND);
+            throw new CourseNotFoundException("courseId", message);
         }
 
         if (!possibleCourse.get().isBuilding()) {
             String message = String.format("O curso com o ID %d não está em construção.", courseId);
-            return buildErrorResponse("courseId", message, HttpStatus.BAD_REQUEST);
+            throw new CourseIsNotBuildingException("courseId", message);
         }
-
-        return Optional.empty();
-    }
-
-    private Optional<ResponseEntity<ErrorItemDTO>> buildErrorResponse(String field, String message, HttpStatus status) {
-        return Optional.of(ResponseEntity.status(status).body(new ErrorItemDTO(field, message)));
     }
 }
