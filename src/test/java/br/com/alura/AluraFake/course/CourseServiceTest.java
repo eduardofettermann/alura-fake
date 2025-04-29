@@ -40,7 +40,6 @@ public class CourseServiceTest {
     @InjectMocks
     private CourseService courseService;
 
-
     private User instructor;
     private NewCourseDTO newCourseDTO;
 
