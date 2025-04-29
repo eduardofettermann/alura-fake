@@ -17,16 +17,16 @@ public class Task {
     private Course course;
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
-    private TaskType taskType;
+    private TaskType type;
     @Column(name = "order_item")
     private Integer order;
     private String statement;
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Alternative> alternatives;
 
-    public Task(Course course, TaskType taskType, Integer order, String statement) {
+    public Task(Course course, TaskType type, Integer order, String statement) {
         this.course = course;
-        this.taskType = taskType;
+        this.type = type;
         this.order = order;
         this.statement = statement;
     }

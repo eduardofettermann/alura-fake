@@ -86,11 +86,11 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$[0].id").value(expectedFirstCourse.id()))
                 .andExpect(jsonPath("$[0].title").value(expectedFirstCourse.title()))
                 .andExpect(jsonPath("$[0].description").value(expectedFirstCourse.description()))
-                .andExpect(jsonPath("$[0].courseStatus").value(expectedFirstCourse.courseStatus().toString()))
+                .andExpect(jsonPath("$[0].status").value(expectedFirstCourse.status().toString()))
                 .andExpect(jsonPath("$[1].id").value(expectedLastCourse.id()))
                 .andExpect(jsonPath("$[1].title").value(expectedLastCourse.title()))
                 .andExpect(jsonPath("$[1].description").value(expectedLastCourse.description()))
-                .andExpect(jsonPath("$[1].courseStatus").value(expectedLastCourse.courseStatus().toString()));
+                .andExpect(jsonPath("$[1].status").value(expectedLastCourse.status().toString()));
     }
 
     @Test

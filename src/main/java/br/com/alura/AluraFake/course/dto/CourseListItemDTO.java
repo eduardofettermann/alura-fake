@@ -9,7 +9,7 @@ public record CourseListItemDTO(
         Long id,
         String title,
         String description,
-        CourseStatus courseStatus
+        CourseStatus status
 ) implements Serializable {
 
     public CourseListItemDTO(Course course) {
