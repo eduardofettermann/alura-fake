@@ -36,7 +36,7 @@ public class UserControllerTest {
     void newUser__should_return_bad_request_when_email_is_blank() throws Exception {
         NewUserDTO newUserDTO = new NewUserDTO("John Doe", "john.doe@example.com", Role.STUDENT, null);
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/user/new")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUserDTO)))
                 .andExpect(status().isCreated());
@@ -48,7 +48,7 @@ public class UserControllerTest {
     void newUser__should_return_bad_request_when_email_is_invalid() throws Exception {
         NewUserDTO newUserDTO = new NewUserDTO("John Doe", "invalid-email", Role.STUDENT, null);
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/user/new")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUserDTO)))
                 .andExpect(status().isBadRequest())
@@ -61,7 +61,7 @@ public class UserControllerTest {
         NewUserDTO newUserDTO = new NewUserDTO("John Doe", "john.doe@example.com", Role.STUDENT, null);
         doThrow(new DuplicateUserEmailException("email")).when(userService).newStudent(newUserDTO);
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/user/new")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUserDTO)))
                 .andExpect(status().isUnprocessableEntity())
@@ -75,7 +75,7 @@ public class UserControllerTest {
         UserListItemDTO user2 = new UserListItemDTO("Jane Doe", "jane.doe@example.com", Role.STUDENT);
         when(userService.listAllUsers()).thenReturn(List.of(user1, user2));
 
-        mockMvc.perform(get("/users")
+        mockMvc.perform(get("/user/all")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("John Doe"))

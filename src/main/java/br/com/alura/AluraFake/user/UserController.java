@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
@@ -18,13 +18,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
+    @PostMapping("/new")
     @ResponseStatus(HttpStatus.CREATED)
     public void newUser(@RequestBody @Valid NewUserDTO newUser) {
         userService.newStudent(newUser);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public List<UserListItemDTO> listAllUsers() {
         return userService.listAllUsers();
     }
