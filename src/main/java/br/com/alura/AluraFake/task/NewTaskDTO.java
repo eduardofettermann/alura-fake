@@ -7,7 +7,7 @@ public class NewTaskDTO {
     @NotNull
     private Long courseId;
     @NotNull
-    private Type type;
+    private TaskType taskType;
     @NotNull
     @Positive(message = "The order must be integer and positive")
     private int order;
@@ -23,12 +23,12 @@ public class NewTaskDTO {
         this.courseId = courseId;
     }
 
-    public Type getType() {
-        return type;
+    public TaskType getType() {
+        return taskType;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public void setType(TaskType taskType) {
+        this.taskType = taskType;
     }
 
     public int getOrder() {

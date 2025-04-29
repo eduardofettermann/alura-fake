@@ -200,13 +200,13 @@ public class TaskControllerTest {
         newOpenTextTaskDTO.setOrder(2);
         Task mockitoTask = new Task(
                 course,
-                Type.OPEN_TEXT,
+                TaskType.OPEN_TEXT,
                 2,
                 "Qual framework é amplamente utilizado para mockar dados no Java?"
         );
         Task springBootTask = new Task(
                 course,
-                Type.SINGLE_CHOICE,
+                TaskType.SINGLE_CHOICE,
                 3,
                 "Qual desses frameworks serve para auxiliar na criação de REST APIs?");
         List<Task> tasks = List.of(mockitoTask, springBootTask);
@@ -816,9 +816,9 @@ public class TaskControllerTest {
     @Test
     void listAllTasks__should_list_all_tasks() throws Exception {
         Course course = mock(Course.class);
-        Task kissTask = new Task(course, Type.OPEN_TEXT, 1, "Explique o que é KISS e as vantagens de sua utilização.");
-        Task yagniTask = new Task(course, Type.OPEN_TEXT, 2, "Explique o que é YAGNI e as vantagens da sua utilização.");
-        Task dryTask = new Task(course, Type.OPEN_TEXT, 3, "Explique o que é DRY e as vantagens da sua utilização.");
+        Task kissTask = new Task(course, TaskType.OPEN_TEXT, 1, "Explique o que é KISS e as vantagens de sua utilização.");
+        Task yagniTask = new Task(course, TaskType.OPEN_TEXT, 2, "Explique o que é YAGNI e as vantagens da sua utilização.");
+        Task dryTask = new Task(course, TaskType.OPEN_TEXT, 3, "Explique o que é DRY e as vantagens da sua utilização.");
 
         doReturn(true).when(course).isBuilding();
 

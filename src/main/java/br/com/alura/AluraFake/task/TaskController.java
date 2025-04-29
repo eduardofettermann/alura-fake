@@ -45,7 +45,7 @@ public class TaskController {
             return possibleTaskErrorItemDTOResponse.get();
         }
 
-        Task task = new Task(possibleCourse.get(), Type.OPEN_TEXT, newOpenTextTaskDTO.getOrder(), newOpenTextTaskDTO.getStatement());
+        Task task = new Task(possibleCourse.get(), TaskType.OPEN_TEXT, newOpenTextTaskDTO.getOrder(), newOpenTextTaskDTO.getStatement());
         taskRepository.save(task);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
@@ -77,7 +77,7 @@ public class TaskController {
 
         Task task = new Task(
                 possibleCourse.get(),
-                Type.SINGLE_CHOICE,
+                TaskType.SINGLE_CHOICE,
                 newSingleChoiceTaskDTO.getOrder(),
                 newSingleChoiceTaskDTO.getStatement()
         );
@@ -118,7 +118,7 @@ public class TaskController {
 
         Task task = new Task(
                 possibleCourse.get(),
-                Type.MULTIPLE_CHOICE,
+                TaskType.MULTIPLE_CHOICE,
                 newMultipleChoiceTaskDTO.getOrder(),
                 newMultipleChoiceTaskDTO.getStatement()
         );

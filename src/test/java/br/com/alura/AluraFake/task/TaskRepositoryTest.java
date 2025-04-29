@@ -12,7 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static br.com.alura.AluraFake.task.Type.*;
+import static br.com.alura.AluraFake.task.TaskType.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest

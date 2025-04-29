@@ -3,14 +3,14 @@ package br.com.alura.AluraFake.task;
 public class NewOpenTextTaskDTO extends NewTaskDTO{
 
     @Override
-    public Type getType() {
-        return Type.OPEN_TEXT;
+    public TaskType getType() {
+        return TaskType.OPEN_TEXT;
     }
 
     @Override
-    public void setType(Type type) { /* O tipo é sempre OPEN_TEXT */ }
+    public void setType(TaskType taskType) { /* O tipo é sempre OPEN_TEXT */ }
 
     public NewOpenTextTaskDTO() {
-        super.setType(Type.OPEN_TEXT);
+        super.setType(TaskType.OPEN_TEXT);
     }
 }
