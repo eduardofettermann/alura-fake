@@ -36,4 +36,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "ORDER BY t.order ASC")
     List<Task> findByCourseIdAndOrderGreaterThanEqualForUpdate(Long courseId, Integer order);
 
+    @Query("SELECT CASE WHEN COUNT(DISTINCT t.type) = 3 THEN TRUE ELSE FALSE END " +
+            "FROM Task t " +
+            "WHERE t.course.id = :courseId")
+    boolean existsAtLeatOneTaskOfEachTypeByCourseId(@Param("courseId") Long courseId);
 }
