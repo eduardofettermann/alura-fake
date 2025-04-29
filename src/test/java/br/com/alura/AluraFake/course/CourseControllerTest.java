@@ -1,6 +1,9 @@
 package br.com.alura.AluraFake.course;
 
-import br.com.alura.AluraFake.user.*;
+import br.com.alura.AluraFake.task.TaskRepository;
+import br.com.alura.AluraFake.user.Role;
+import br.com.alura.AluraFake.user.User;
+import br.com.alura.AluraFake.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +12,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CourseController.class)
 class CourseControllerTest {
@@ -24,6 +30,8 @@ class CourseControllerTest {
     private UserRepository userRepository;
     @MockBean
     private CourseRepository courseRepository;
+    @MockBean
+    private TaskRepository taskRepository;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -111,4 +119,57 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$[2].description").value("Curso de spring"));
     }
 
+    @Test
+    void publishCourse__should_return_not_found_when_course_not_exists() throws Exception {
+        Long courseIdMocked = 1L;
+        doReturn(Optional.empty()).when(courseRepository).findById(courseIdMocked);
+
+        mockMvc.perform(post("/course/".concat(courseIdMocked.toString()).concat("/publish")))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.field").value("id"))
+                .andExpect(jsonPath("$.message").isNotEmpty());
+    }
+
+    @Test
+    void publishCourse__should_return_bad_request_when_course_has_not_at_least_one_task_of_each_type() throws Exception {
+        Long courseIdMocked = 1L;
+
+        doReturn(Optional.of(mock(Course.class))).when(courseRepository).findById(courseIdMocked);
+        doReturn(false).when(taskRepository).existsAtLeatOneTaskOfEachTypeByCourseId(courseIdMocked);
+
+        mockMvc.perform(post("/course/".concat(courseIdMocked.toString()).concat("/publish")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.field").value("tasks"))
+                .andExpect(jsonPath("$.message").isNotEmpty());
+    }
+
+    @Test
+    void publishCourse__should_return_bad_request_when_course_status_is_not_building() throws Exception {
+        Course mockedCourse =  mock(Course.class);
+        Long mockedCourseId = 1L;
+
+        doReturn(Optional.of(mockedCourse)).when(courseRepository).findById(mockedCourseId);
+        doReturn(true).when(taskRepository).existsAtLeatOneTaskOfEachTypeByCourseId(mockedCourseId);
+        doReturn(false).when(mockedCourse).isBuilding();
+
+        mockMvc.perform(post("/course/".concat(mockedCourseId.toString()).concat("/publish")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.field").value("status"))
+                .andExpect(jsonPath("$.message").isNotEmpty());
+    }
+
+    @Test
+    void publishCourse__should_return_ok_when_course_is_valid_to_publish() throws Exception {
+        Course mockedCourse =  mock(Course.class);
+        Long mockedCourseId = 1L;
+
+        doReturn(Optional.of(mockedCourse)).when(courseRepository).findById(mockedCourseId);
+        doReturn(true).when(taskRepository).existsAtLeatOneTaskOfEachTypeByCourseId(mockedCourseId);
+        doReturn(true).when(mockedCourse).isBuilding();
+
+        mockMvc.perform(post("/course/".concat(mockedCourseId.toString()).concat("/publish")))
+                .andExpect(status().isOk());
+
+        verify(courseRepository, times(1)).save(any(Course.class));
+    }
 }

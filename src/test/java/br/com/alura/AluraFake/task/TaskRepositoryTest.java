@@ -12,8 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static br.com.alura.AluraFake.task.Type.OPEN_TEXT;
-import static br.com.alura.AluraFake.task.Type.SINGLE_CHOICE;
+import static br.com.alura.AluraFake.task.Type.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
@@ -170,5 +169,45 @@ class TaskRepositoryTest {
         tasksWithGreaterOrderThanNewOrder = taskRepository
                 .findByCourseIdAndOrderGreaterThanEqualForUpdate(2L, 2);
         assertThat(tasksWithGreaterOrderThanNewOrder).isEqualTo(List.of());
+    }
+
+    @Test
+    void existsAtLeatOneTaskOfEachTypeByCourseId__should_return_if_course_has_at_least_one_task_of_each_type() {
+        User user = new User("Eduardo", "eduardofettermann212@gmail.com", Role.INSTRUCTOR);
+        Course course = new Course(
+                "Object Calisthenics em Java ",
+                "Aprofunde-se em boas práticas de POO com Alura",
+                user
+        );
+        Task springSecurity = new Task(
+                course, OPEN_TEXT,
+                1,
+                "Pra que serve o Spring Security?"
+        );
+        Task migrations = new Task(
+                course, SINGLE_CHOICE,
+                2,
+                "No que as migrations nos ajudam?"
+        );
+        Task codeConventions = new Task(
+                course, MULTIPLE_CHOICE,
+                2,
+                "No que as convenções de código ajudam?"
+        );
+
+        userRepository.save(user);
+        courseRepository.save(course);
+        taskRepository.save(springSecurity);
+        taskRepository.save(migrations);
+        taskRepository.save(codeConventions);
+        boolean tasksWithGreaterOrderThanNewOrder = taskRepository.existsAtLeatOneTaskOfEachTypeByCourseId(
+                course.getId()
+        );
+
+        assertThat(tasksWithGreaterOrderThanNewOrder).isTrue();
+
+        tasksWithGreaterOrderThanNewOrder = taskRepository
+                .existsAtLeatOneTaskOfEachTypeByCourseId(2L);
+        assertThat(tasksWithGreaterOrderThanNewOrder).isFalse();
     }
 }
