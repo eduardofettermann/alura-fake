@@ -1,5 +1,6 @@
 package br.com.alura.AluraFake.course;
 
+import br.com.alura.AluraFake.task.TaskRepository;
 import br.com.alura.AluraFake.user.*;
 import br.com.alura.AluraFake.util.ErrorItemDTO;
 import jakarta.validation.Valid;
@@ -15,11 +16,13 @@ public class CourseController {
 
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
 
     @Autowired
-    public CourseController(CourseRepository courseRepository, UserRepository userRepository){
+    public CourseController(CourseRepository courseRepository, UserRepository userRepository, TaskRepository taskRepository) {
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
+        this.taskRepository = taskRepository;
     }
 
     @Transactional
@@ -51,7 +54,28 @@ public class CourseController {
     }
 
     @PostMapping("/course/{id}/publish")
-    public ResponseEntity createCourse(@PathVariable("id") Long id) {
+    public ResponseEntity publishCourse(@PathVariable("id") Long id) {
+        // Dúvida: Validar ou não se a ordem das Tasks estão em sequência, pois essa validação já é feita na criação das mesmas
+        Optional<Course> possibleCourse = courseRepository.findById(id);
+        if (possibleCourse.isEmpty()) {
+            String message = String.format("Um curso com o ID %d não foi encontrado.", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorItemDTO("id", message));
+        }
+
+        Course course = possibleCourse.get();
+
+        boolean courseHasAtLeastOneTaskOfEachType = taskRepository.existsAtLeatOneTaskOfEachTypeByCourseId(id);
+        if (!courseHasAtLeastOneTaskOfEachType) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorItemDTO("tasks", "O curso deve conter ao menos uma atividade de cada tipo."));
+        }
+
+        if (!course.isBuilding()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorItemDTO("status", "O curso só pode ser publicado se o status for BUILDING."));
+        }
+
         return ResponseEntity.ok().build();
     }
 
