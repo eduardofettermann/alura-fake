@@ -3,10 +3,13 @@ package br.com.alura.AluraFake.course;
 import br.com.alura.AluraFake.course.dto.CourseListItemDTO;
 import br.com.alura.AluraFake.course.dto.NewCourseDTO;
 import br.com.alura.AluraFake.course.model.Course;
+import br.com.alura.AluraFake.exception.domain.CourseIsNotBuildingException;
+import br.com.alura.AluraFake.exception.domain.CourseNotFoundException;
+import br.com.alura.AluraFake.exception.domain.MissingRequiredTaskTypesException;
+import br.com.alura.AluraFake.exception.forbidden.NotAnInstructorException;
 import br.com.alura.AluraFake.task.TaskRepository;
 import br.com.alura.AluraFake.user.*;
 import br.com.alura.AluraFake.user.model.User;
-import br.com.alura.AluraFake.util.ErrorItemDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -39,8 +42,7 @@ public class CourseController {
                 .filter(User::isInstructor);
 
         if(possibleAuthor.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorItemDTO("emailInstructor", "Usuário não é um instrutor"));
+            throw new NotAnInstructorException("emailInstructor");
         }
 
         Course course = new Course(newCourse.title(), newCourse.description(), possibleAuthor.get());
@@ -64,21 +66,19 @@ public class CourseController {
         Optional<Course> possibleCourse = courseRepository.findById(id);
         if (possibleCourse.isEmpty()) {
             String message = String.format("Um curso com o ID %d não foi encontrado.", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorItemDTO("id", message));
+            throw new CourseNotFoundException("id", message);
         }
 
         Course course = possibleCourse.get();
 
         boolean courseHasAtLeastOneTaskOfEachType = taskRepository.existsAtLeatOneTaskOfEachTypeByCourseId(id);
         if (!courseHasAtLeastOneTaskOfEachType) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorItemDTO("tasks", "O curso deve conter ao menos uma atividade de cada tipo."));
+            throw new MissingRequiredTaskTypesException("tasks");
         }
 
         if (!course.isBuilding()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorItemDTO("status", "O curso só pode ser publicado se o status for BUILDING."));
+            String message = String.format("O curso com o ID %d não está em construção.", course.getId());
+            throw new CourseIsNotBuildingException("status", message);
         }
 
         course.publish();

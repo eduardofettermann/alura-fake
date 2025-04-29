@@ -40,17 +40,16 @@ class CourseControllerTest {
     @Test
     void newCourseDTO__should_return_bad_request_when_email_is_invalid() throws Exception {
 
-        NewCourseDTO newCourseDTO = new NewCourseDTO("Java", "Java", "paulo@alura.com.br");
+        NewCourseDTO newCourseDTO = new NewCourseDTO("Java", "Java", "pauloalura.com.br");
 
-        doReturn(Optional.empty()).when(userRepository)
-                .findByEmail(newCourseDTO.emailInstructor());
+
 
         mockMvc.perform(post("/course/new")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newCourseDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.field").value("emailInstructor"))
-                .andExpect(jsonPath("$.message").isNotEmpty());
+                .andExpect(jsonPath("$[0].field").value("emailInstructor"))
+                .andExpect(jsonPath("$[0].message").isNotEmpty());
     }
 
 
@@ -68,7 +67,7 @@ class CourseControllerTest {
         mockMvc.perform(post("/course/new")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newCourseDTO)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.field").value("emailInstructor"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
@@ -118,7 +117,7 @@ class CourseControllerTest {
         doReturn(Optional.empty()).when(courseRepository).findById(courseIdMocked);
 
         mockMvc.perform(post("/course/".concat(courseIdMocked.toString()).concat("/publish")))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.field").value("id"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
@@ -131,7 +130,7 @@ class CourseControllerTest {
         doReturn(false).when(taskRepository).existsAtLeatOneTaskOfEachTypeByCourseId(courseIdMocked);
 
         mockMvc.perform(post("/course/".concat(courseIdMocked.toString()).concat("/publish")))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.field").value("tasks"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
@@ -146,7 +145,7 @@ class CourseControllerTest {
         doReturn(false).when(mockedCourse).isBuilding();
 
         mockMvc.perform(post("/course/".concat(mockedCourseId.toString()).concat("/publish")))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.field").value("status"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
