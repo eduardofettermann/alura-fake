@@ -54,6 +54,7 @@ public class CourseController {
     }
 
     @PostMapping("/course/{id}/publish")
+    @Transactional
     public ResponseEntity publishCourse(@PathVariable("id") Long id) {
         // Dúvida: Validar ou não se a ordem das Tasks estão em sequência, pois essa validação já é feita na criação das mesmas
         Optional<Course> possibleCourse = courseRepository.findById(id);
@@ -75,6 +76,9 @@ public class CourseController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorItemDTO("status", "O curso só pode ser publicado se o status for BUILDING."));
         }
+
+        course.publish();
+        courseRepository.save(course);
 
         return ResponseEntity.ok().build();
     }
