@@ -31,10 +31,7 @@ class UserControllerTest {
 
     @Test
     void newUser__should_return_bad_request_when_email_is_blank() throws Exception {
-        NewUserDTO newUserDTO = new NewUserDTO();
-        newUserDTO.setEmail("");
-        newUserDTO.setName("Caio Bugorin");
-        newUserDTO.setRole(Role.STUDENT);
+        NewUserDTO newUserDTO = new NewUserDTO("Caio Bugorin", "", Role.STUDENT, null);
 
         mockMvc.perform(post("/user/new")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -46,10 +43,7 @@ class UserControllerTest {
 
     @Test
     void newUser__should_return_bad_request_when_email_is_invalid() throws Exception {
-        NewUserDTO newUserDTO = new NewUserDTO();
-        newUserDTO.setEmail("caio");
-        newUserDTO.setName("Caio Bugorin");
-        newUserDTO.setRole(Role.STUDENT);
+        NewUserDTO newUserDTO = new NewUserDTO("Caio Bugorin", "caio", Role.STUDENT, null);
 
         mockMvc.perform(post("/user/new")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -61,12 +55,9 @@ class UserControllerTest {
 
     @Test
     void newUser__should_return_bad_request_when_email_already_exists() throws Exception {
-        NewUserDTO newUserDTO = new NewUserDTO();
-        newUserDTO.setEmail("caio.bugorin@alura.com.br");
-        newUserDTO.setName("Caio Bugorin");
-        newUserDTO.setRole(Role.STUDENT);
+        NewUserDTO newUserDTO = new NewUserDTO("Caio Bugorin","caio.bugorin@alura.com.br", Role.STUDENT, null);
 
-        when(userRepository.existsByEmail(newUserDTO.getEmail())).thenReturn(true);
+        when(userRepository.existsByEmail(newUserDTO.email())).thenReturn(true);
 
         mockMvc.perform(post("/user/new")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -78,12 +69,9 @@ class UserControllerTest {
 
     @Test
     void newUser__should_return_created_when_user_request_is_valid() throws Exception {
-        NewUserDTO newUserDTO = new NewUserDTO();
-        newUserDTO.setEmail("caio.bugorin@alura.com.br");
-        newUserDTO.setName("Caio Bugorin");
-        newUserDTO.setRole(Role.STUDENT);
+        NewUserDTO newUserDTO = new NewUserDTO("Caio Bugorin", "caio.bugorin@alura.com.br", Role.STUDENT, null);
 
-        when(userRepository.existsByEmail(newUserDTO.getEmail())).thenReturn(false);
+        when(userRepository.existsByEmail(newUserDTO.email())).thenReturn(false);
 
         mockMvc.perform(post("/user/new")
                         .contentType(MediaType.APPLICATION_JSON)

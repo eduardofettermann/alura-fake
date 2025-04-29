@@ -5,55 +5,22 @@ import br.com.alura.AluraFake.user.model.User;
 import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.Length;
 
-public class NewUserDTO {
+public record NewUserDTO(
+        @NotNull
+        @Length(min = 3, max = 50)
+        String name,
 
-    @NotNull
-    @Length(min = 3, max = 50)
-    private String name;
-    @NotBlank
-    @Email
-    private String email;
-    @NotNull
-    private Role role;
-    @Pattern(regexp = "^$|^.{6}$", message = "Password must be exactly 6 characters long if provided")
-    private String password;
+        @NotBlank
+        @Email
+        String email,
 
-    public NewUserDTO() {}
+        @NotNull
+        Role role,
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
+        @Pattern(regexp = "^$|^.{6}$", message = "Password must be exactly 6 characters long if provided")
+        String password
+) {
     public User toModel() {
         return new User(name, email, role);
     }
-
 }
