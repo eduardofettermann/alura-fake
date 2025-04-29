@@ -2,7 +2,7 @@ CREATE TABLE Task (
     id bigint(20) NOT NULL AUTO_INCREMENT,
     createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     course_id bigint(20) NOT NULL,
-    taskType enum('OPEN_TEXT', 'SINGLE_CHOICE', 'MULTIPLE_CHOICE') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'OPEN_TEXT',
+    type enum('OPEN_TEXT', 'SINGLE_CHOICE', 'MULTIPLE_CHOICE') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'OPEN_TEXT',
     order_item int NOT NULL,
     statement varchar(255) NOT NULL,
     PRIMARY KEY (id),
