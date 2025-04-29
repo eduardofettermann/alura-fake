@@ -17,8 +17,9 @@ public class Course {
     private String description;
     @ManyToOne
     private User instructor;
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private CourseStatus courseStatus;
     private LocalDateTime publishedAt;
 
     @Deprecated
@@ -29,7 +30,7 @@ public class Course {
         this.title = title;
         this.instructor = instructor;
         this.description = description;
-        this.status = Status.BUILDING;
+        this.courseStatus = CourseStatus.BUILDING;
     }
 
     public Long getId() {
@@ -44,8 +45,8 @@ public class Course {
         return title;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setStatus(CourseStatus courseStatus) {
+        this.courseStatus = courseStatus;
     }
 
     public User getInstructor() {
@@ -56,8 +57,8 @@ public class Course {
         return description;
     }
 
-    public Status getStatus() {
-        return status;
+    public CourseStatus getStatus() {
+        return courseStatus;
     }
 
     public LocalDateTime getPublishedAt() {
@@ -65,11 +66,11 @@ public class Course {
     }
 
     public boolean isBuilding() {
-        return Status.BUILDING == this.status;
+        return CourseStatus.BUILDING == this.courseStatus;
     }
 
     public void publish() {
-        this.status = Status.PUBLISHED;
+        this.courseStatus = CourseStatus.PUBLISHED;
         this.publishedAt = LocalDateTime.now();
     }
 }

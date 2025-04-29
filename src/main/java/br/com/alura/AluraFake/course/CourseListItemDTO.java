@@ -7,13 +7,13 @@ public class CourseListItemDTO implements Serializable {
     private Long id;
     private String title;
     private String description;
-    private Status status;
+    private CourseStatus courseStatus;
 
     public CourseListItemDTO(Course course) {
         this.id = course.getId();
         this.title = course.getTitle();
         this.description = course.getDescription();
-        this.status = course.getStatus();
+        this.courseStatus = course.getStatus();
     }
 
     public Long getId() {
@@ -28,7 +28,7 @@ public class CourseListItemDTO implements Serializable {
         return description;
     }
 
-    public Status getStatus() {
-        return status;
+    public CourseStatus getStatus() {
+        return courseStatus;
     }
 }

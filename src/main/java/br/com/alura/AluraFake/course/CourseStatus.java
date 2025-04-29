@@ -1,6 +1,6 @@
 package br.com.alura.AluraFake.course;
 
-public enum Status {
+public enum CourseStatus {
     BUILDING,
     PUBLISHED,
 }
