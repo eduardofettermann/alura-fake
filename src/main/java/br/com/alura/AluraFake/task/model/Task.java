@@ -1,7 +1,7 @@
-package br.com.alura.AluraFake.task;
+package br.com.alura.AluraFake.task.model;
 
-import br.com.alura.AluraFake.alternative.Alternative;
-import br.com.alura.AluraFake.course.Course;
+import br.com.alura.AluraFake.alternative.model.Alternative;
+import br.com.alura.AluraFake.course.model.Course;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -15,15 +15,16 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "course_id", referencedColumnName = "id", nullable = false)
     private Course course;
+    @Column(name = "type")
     @Enumerated(EnumType.STRING)
-    private Type type;
+    private TaskType type;
     @Column(name = "order_item")
     private Integer order;
     private String statement;
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Alternative> alternatives;
 
-    public Task(Course course, Type type, Integer order, String statement) {
+    public Task(Course course, TaskType type, Integer order, String statement) {
         this.course = course;
         this.type = type;
         this.order = order;

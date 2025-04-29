@@ -1,9 +1,10 @@
 package br.com.alura.AluraFake.task;
 
-import br.com.alura.AluraFake.course.Course;
+import br.com.alura.AluraFake.course.model.Course;
 import br.com.alura.AluraFake.course.CourseRepository;
-import br.com.alura.AluraFake.user.Role;
-import br.com.alura.AluraFake.user.User;
+import br.com.alura.AluraFake.task.model.Task;
+import br.com.alura.AluraFake.user.model.Role;
+import br.com.alura.AluraFake.user.model.User;
 import br.com.alura.AluraFake.user.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static br.com.alura.AluraFake.task.Type.*;
+import static br.com.alura.AluraFake.task.model.TaskType.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest

@@ -1,6 +1,6 @@
-package br.com.alura.AluraFake.alternative;
+package br.com.alura.AluraFake.alternative.model;
 
-import br.com.alura.AluraFake.task.Task;
+import br.com.alura.AluraFake.task.model.Task;
 import jakarta.persistence.*;
 
 @Entity

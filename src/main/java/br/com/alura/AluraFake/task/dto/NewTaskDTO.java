@@ -1,5 +1,6 @@
-package br.com.alura.AluraFake.task;
+package br.com.alura.AluraFake.task.dto;
 
+import br.com.alura.AluraFake.task.model.TaskType;
 import jakarta.validation.constraints.*;
 
 public class NewTaskDTO {
@@ -7,7 +8,7 @@ public class NewTaskDTO {
     @NotNull
     private Long courseId;
     @NotNull
-    private Type type;
+    private TaskType type;
     @NotNull
     @Positive(message = "The order must be integer and positive")
     private int order;
@@ -23,12 +24,12 @@ public class NewTaskDTO {
         this.courseId = courseId;
     }
 
-    public Type getType() {
+    public TaskType getType() {
         return type;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public void setType(TaskType taskType) {
+        this.type = taskType;
     }
 
     public int getOrder() {

@@ -1,6 +1,7 @@
-package br.com.alura.AluraFake.task;
+package br.com.alura.AluraFake.task.dto;
 
-import br.com.alura.AluraFake.alternative.NewAlternativeDTO;
+import br.com.alura.AluraFake.alternative.dto.NewAlternativeDTO;
+import br.com.alura.AluraFake.task.model.TaskType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -22,14 +23,14 @@ public class NewSingleChoiceTaskDTO extends NewTaskDTO {
     }
 
     @Override
-    public Type getType() {
-        return Type.SINGLE_CHOICE;
+    public TaskType getType() {
+        return TaskType.SINGLE_CHOICE;
     }
 
     @Override
-    public void setType(Type type) { /* O tipo é sempre SINGLE_CHOICE */ }
+    public void setType(TaskType taskType) { /* O tipo é sempre SINGLE_CHOICE */ }
 
     public NewSingleChoiceTaskDTO() {
-        super.setType(Type.SINGLE_CHOICE);
+        super.setType(TaskType.SINGLE_CHOICE);
     }
 }
