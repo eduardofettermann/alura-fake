@@ -2,26 +2,17 @@ package br.com.alura.AluraFake.task.dto;
 
 import br.com.alura.AluraFake.task.model.Task;
 
-public class TaskListItemDTO {
-    private Long courseId;
-    private String statement;
-    private Integer order;
+public record TaskListItemDTO(
+        Long courseId,
+        String statement,
+        Integer order
+) {
 
     public TaskListItemDTO(Task task) {
-        this.courseId = task.getCourse().getId();
-        this.statement = task.getStatement();
-        this.order = task.getOrder();
-    }
-
-    public Long getCourseId() {
-        return courseId;
-    }
-
-    public String getStatement() {
-        return statement;
-    }
-
-    public Integer getOrder() {
-        return order;
+        this(
+                task.getCourse().getId(),
+                task.getStatement(),
+                task.getOrder()
+        );
     }
 }
