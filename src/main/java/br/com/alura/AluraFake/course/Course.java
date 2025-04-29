@@ -67,4 +67,9 @@ public class Course {
     public boolean isBuilding() {
         return Status.BUILDING == this.status;
     }
+
+    public void publish() {
+        this.status = Status.PUBLISHED;
+        this.publishedAt = LocalDateTime.now();
+    }
 }
