@@ -1,6 +1,7 @@
 package br.com.alura.AluraFake.util;
 
 import br.com.alura.AluraFake.exception.DomainException;
+import br.com.alura.AluraFake.exception.ForbiddenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -25,5 +26,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorItemDTO> handleDomainException(DomainException ex) {
         ErrorItemDTO error = new ErrorItemDTO(ex.getField(), ex.getMessage());
         return ResponseEntity.unprocessableEntity().body(error);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<ErrorItemDTO> handleForbiddenException(ForbiddenException ex) {
+        ErrorItemDTO error = new ErrorItemDTO(ex.getField(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 }
