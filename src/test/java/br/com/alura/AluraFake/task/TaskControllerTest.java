@@ -38,7 +38,7 @@ public class TaskControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void newOpenTextExercise__should_return_not_found_when_course_with_id_doesnt_exists() throws Exception {
+    void newOpenTextExercise__should_return_unprocessable_entity_when_course_with_id_doesnt_exists() throws Exception {
         NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
         newOpenTextTaskDTO.setCourseId(1L);
         newOpenTextTaskDTO.setStatement("O que foi apresentado na Imersão Gemini?");
@@ -92,7 +92,7 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newOpenTextExercise__should_return_bad_request_when_statement_is_duplicated_by_course_id() throws Exception {
+    void newOpenTextExercise__should_return_unprocessable_entity_when_statement_is_duplicated_by_course_id() throws Exception {
         Course course = mock(Course.class);
         NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
         Long courseId = 1L;
@@ -133,7 +133,7 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newOpenTextExercise__should_return_bad_request_when_course_is_not_building() throws Exception {
+    void newOpenTextExercise__should_return_unprocessable_entity_when_course_is_not_building() throws Exception {
         Course course = mock(Course.class);
         NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
         newOpenTextTaskDTO.setCourseId(course.getId());
@@ -153,7 +153,7 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newOpenTextExercise__should_return_bad_request_when_order_is_out_of_sequence() throws Exception {
+    void newOpenTextExercise__should_return_unprocessable_entity_when_order_is_out_of_sequence() throws Exception {
         Course course = mock(Course.class);
         NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
         newOpenTextTaskDTO.setCourseId(course.getId());
@@ -175,7 +175,7 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newOpenTextExercise__should_return_bad_request_when_hasnt_tasks_with_course_id_and_order_is_out_of_sequence() throws Exception {
+    void newOpenTextExercise__should_return_unprocessable_entity_when_hasnt_tasks_with_course_id_and_order_is_out_of_sequence() throws Exception {
         Course course = mock(Course.class);
         NewOpenTextTaskDTO newOpenTextTaskDTO = new NewOpenTextTaskDTO();
         newOpenTextTaskDTO.setCourseId(course.getId());
@@ -372,7 +372,7 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newSingleChoice__should_return_bad_request_when_task_has_more_than_one_correct_alternative() throws Exception {
+    void newSingleChoice__should_return_unprocessable_entity_when_task_has_more_than_one_correct_alternative() throws Exception {
         Course course = mock(Course.class);
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
         newSingleChoiceTaskDTO.setCourseId(course.getId());
@@ -398,7 +398,7 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newSingleChoice__should_return_bad_request_when_task_has_alternatives_with_same_options() throws Exception {
+    void newSingleChoice__should_return_unprocessable_entity_when_task_has_alternatives_with_same_options() throws Exception {
         Course course = mock(Course.class);
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
         newSingleChoiceTaskDTO.setCourseId(course.getId());
@@ -423,7 +423,7 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newSingleChoice__should_return_bad_request_when_task_has_alternatives_with_options_equals_to_statement() throws Exception {
+    void newSingleChoice__should_return_unprocessable_entity_when_task_has_alternatives_with_options_equals_to_statement() throws Exception {
         Course course = mock(Course.class);
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = new NewSingleChoiceTaskDTO();
         newSingleChoiceTaskDTO.setCourseId(course.getId());
@@ -594,7 +594,7 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newMultipleChoice__should_return_bad_request_when_task_has_not_incorrect_alternative() throws Exception {
+    void newMultipleChoice__should_return_unprocessable_entity_when_task_has_not_incorrect_alternative() throws Exception {
         Course course = mock(Course.class);
         NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO = new NewMultipleChoiceTaskDTO();
         newMultipleChoiceTaskDTO.setCourseId(course.getId());
@@ -621,7 +621,7 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newMultipleChoice__should_return_bad_request_when_task_has_alternatives_with_same_options() throws Exception {
+    void newMultipleChoice__should_return_unprocessable_entity_when_task_has_alternatives_with_same_options() throws Exception {
         Course course = mock(Course.class);
         NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO = new NewMultipleChoiceTaskDTO();
         newMultipleChoiceTaskDTO.setCourseId(course.getId());
@@ -647,7 +647,7 @@ public class TaskControllerTest {
     }
 
     @Test
-    void newMultipleChoice__should_return_bad_request_when_task_has_alternatives_with_options_equals_to_statement() throws Exception {
+    void newMultipleChoice__should_return_unprocessable_entity_when_task_has_alternatives_with_options_equals_to_statement() throws Exception {
         Course course = mock(Course.class);
         NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO = new NewMultipleChoiceTaskDTO();
         newMultipleChoiceTaskDTO.setCourseId(course.getId());

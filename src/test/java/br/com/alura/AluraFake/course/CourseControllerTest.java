@@ -112,7 +112,7 @@ class CourseControllerTest {
     }
 
     @Test
-    void publishCourse__should_return_not_found_when_course_not_exists() throws Exception {
+    void publishCourse__should_return_unprocessable_entity_when_course_not_exists() throws Exception {
         Long courseIdMocked = 1L;
         doReturn(Optional.empty()).when(courseRepository).findById(courseIdMocked);
 
@@ -123,7 +123,7 @@ class CourseControllerTest {
     }
 
     @Test
-    void publishCourse__should_return_bad_request_when_course_has_not_at_least_one_task_of_each_type() throws Exception {
+    void publishCourse__should_return_unprocessable_entity_when_course_has_not_at_least_one_task_of_each_type() throws Exception {
         Long courseIdMocked = 1L;
 
         doReturn(Optional.of(mock(Course.class))).when(courseRepository).findById(courseIdMocked);
@@ -136,7 +136,7 @@ class CourseControllerTest {
     }
 
     @Test
-    void publishCourse__should_return_bad_request_when_course_status_is_not_building() throws Exception {
+    void publishCourse__should_return_unprocessable_entity_when_course_status_is_not_building() throws Exception {
         Course mockedCourse =  mock(Course.class);
         Long mockedCourseId = 1L;
 

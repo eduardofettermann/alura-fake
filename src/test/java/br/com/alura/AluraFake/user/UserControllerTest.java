@@ -54,7 +54,7 @@ class UserControllerTest {
     }
 
     @Test
-    void newUser__should_return_bad_request_when_email_already_exists() throws Exception {
+    void newUser__should_return_unprocessable_entity_when_email_already_exists() throws Exception {
         NewUserDTO newUserDTO = new NewUserDTO("Caio Bugorin","caio.bugorin@alura.com.br", Role.STUDENT, null);
 
         when(userRepository.existsByEmail(newUserDTO.email())).thenReturn(true);
