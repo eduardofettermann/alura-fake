@@ -1,5 +1,6 @@
-package br.com.alura.AluraFake.task;
+package br.com.alura.AluraFake.task.dto;
 
+import br.com.alura.AluraFake.task.model.TaskType;
 import jakarta.validation.constraints.*;
 
 public class NewTaskDTO {

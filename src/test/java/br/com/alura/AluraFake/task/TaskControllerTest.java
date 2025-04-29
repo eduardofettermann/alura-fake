@@ -1,8 +1,13 @@
 package br.com.alura.AluraFake.task;
 
-import br.com.alura.AluraFake.alternative.NewAlternativeDTO;
-import br.com.alura.AluraFake.course.Course;
+import br.com.alura.AluraFake.alternative.dto.NewAlternativeDTO;
+import br.com.alura.AluraFake.course.model.Course;
 import br.com.alura.AluraFake.course.CourseRepository;
+import br.com.alura.AluraFake.task.dto.NewMultipleChoiceTaskDTO;
+import br.com.alura.AluraFake.task.dto.NewOpenTextTaskDTO;
+import br.com.alura.AluraFake.task.dto.NewSingleChoiceTaskDTO;
+import br.com.alura.AluraFake.task.model.Task;
+import br.com.alura.AluraFake.task.model.TaskType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

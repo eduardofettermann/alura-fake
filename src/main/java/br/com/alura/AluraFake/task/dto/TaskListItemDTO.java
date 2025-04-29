@@ -1,4 +1,6 @@
-package br.com.alura.AluraFake.task;
+package br.com.alura.AluraFake.task.dto;
+
+import br.com.alura.AluraFake.task.model.Task;
 
 public class TaskListItemDTO {
     private Long courseId;

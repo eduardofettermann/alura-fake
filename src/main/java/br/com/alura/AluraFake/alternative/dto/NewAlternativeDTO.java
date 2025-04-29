@@ -1,4 +1,4 @@
-package br.com.alura.AluraFake.alternative;
+package br.com.alura.AluraFake.alternative.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

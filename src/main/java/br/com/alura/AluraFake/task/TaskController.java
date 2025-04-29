@@ -1,9 +1,12 @@
 package br.com.alura.AluraFake.task;
 
-import br.com.alura.AluraFake.alternative.Alternative;
-import br.com.alura.AluraFake.alternative.NewAlternativeDTO;
-import br.com.alura.AluraFake.course.Course;
+import br.com.alura.AluraFake.alternative.model.Alternative;
+import br.com.alura.AluraFake.alternative.dto.NewAlternativeDTO;
+import br.com.alura.AluraFake.course.model.Course;
 import br.com.alura.AluraFake.course.CourseRepository;
+import br.com.alura.AluraFake.task.dto.*;
+import br.com.alura.AluraFake.task.model.Task;
+import br.com.alura.AluraFake.task.model.TaskType;
 import br.com.alura.AluraFake.util.ErrorItemDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

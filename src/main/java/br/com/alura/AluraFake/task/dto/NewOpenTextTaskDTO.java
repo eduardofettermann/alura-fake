@@ -1,6 +1,8 @@
-package br.com.alura.AluraFake.task;
+package br.com.alura.AluraFake.task.dto;
 
-public class NewOpenTextTaskDTO extends NewTaskDTO{
+import br.com.alura.AluraFake.task.model.TaskType;
+
+public class NewOpenTextTaskDTO extends NewTaskDTO {
 
     @Override
     public TaskType getType() {
