@@ -1,11 +1,12 @@
 package br.com.alura.AluraFake.course;
 
+import br.com.alura.AluraFake.course.dto.CourseListItemDTO;
 import br.com.alura.AluraFake.course.dto.NewCourseDTO;
-import br.com.alura.AluraFake.course.model.Course;
-import br.com.alura.AluraFake.task.TaskRepository;
-import br.com.alura.AluraFake.user.model.Role;
-import br.com.alura.AluraFake.user.model.User;
-import br.com.alura.AluraFake.user.UserRepository;
+import br.com.alura.AluraFake.course.model.CourseStatus;
+import br.com.alura.AluraFake.exception.domain.CourseIsNotBuildingException;
+import br.com.alura.AluraFake.exception.domain.CourseNotFoundException;
+import br.com.alura.AluraFake.exception.domain.MissingRequiredTaskTypesException;
+import br.com.alura.AluraFake.exception.forbidden.NotAnInstructorException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,153 +16,126 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
-import java.util.Optional;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CourseController.class)
 class CourseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @MockBean
-    private UserRepository userRepository;
-    @MockBean
-    private CourseRepository courseRepository;
-    @MockBean
-    private TaskRepository taskRepository;
+    private CourseService courseService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    void newCourseDTO__should_return_bad_request_when_email_is_invalid() throws Exception {
-
-        NewCourseDTO newCourseDTO = new NewCourseDTO("Java", "Java", "pauloalura.com.br");
-
-
+    void createCourse_should_return_bad_request_when_dto_is_invalid() throws Exception {
+        NewCourseDTO invalidCourse = new NewCourseDTO("Java", "Java", "invalid-email");
 
         mockMvc.perform(post("/course/new")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newCourseDTO)))
+                        .content(objectMapper.writeValueAsString(invalidCourse)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0].field").value("emailInstructor"))
                 .andExpect(jsonPath("$[0].message").isNotEmpty());
     }
 
-
     @Test
-    void newCourseDTO__should_return_bad_request_when_email_is_no_instructor() throws Exception {
+    void createCourse_should_return_forbidden_when_instructor_not_found() throws Exception {
+        NewCourseDTO newCourse = new NewCourseDTO("Java", "Java", "paulo@alura.com.br");
 
-        NewCourseDTO newCourseDTO = new NewCourseDTO("Java", "Java", "paulo@alura.com.br");
-
-        User user = mock(User.class);
-        doReturn(false).when(user).isInstructor();
-
-        doReturn(Optional.of(user)).when(userRepository)
-                .findByEmail(newCourseDTO.emailInstructor());
+        doThrow(new NotAnInstructorException("emailInstructor"))
+                .when(courseService).createCourse(any(NewCourseDTO.class));
 
         mockMvc.perform(post("/course/new")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newCourseDTO)))
+                        .content(objectMapper.writeValueAsString(newCourse)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.field").value("emailInstructor"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 
     @Test
-    void newCourseDTO__should_return_created_when_new_course_request_is_valid() throws Exception {
-
-        NewCourseDTO newCourseDTO = new NewCourseDTO("Java", "Java", "paulo@alura.com.br");
-
-        User user = mock(User.class);
-        doReturn(true).when(user).isInstructor();
-
-        doReturn(Optional.of(user)).when(userRepository).findByEmail(newCourseDTO.emailInstructor());
+    void createCourse_should_return_created_when_valid() throws Exception {
+        NewCourseDTO newCourse = new NewCourseDTO("Java", "Java", "paulo@alura.com.br");
 
         mockMvc.perform(post("/course/new")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newCourseDTO)))
+                        .content(objectMapper.writeValueAsString(newCourse)))
                 .andExpect(status().isCreated());
 
-        verify(courseRepository, times(1)).save(any(Course.class));
+        verify(courseService, times(1)).createCourse(any(NewCourseDTO.class));
     }
 
     @Test
-    void listAllCourses__should_list_all_courses() throws Exception {
-        User paulo = new User("Paulo", "paulo@alua.com.br", Role.INSTRUCTOR);
-
-        Course java = new Course("Java", "Curso de java", paulo);
-        Course hibernate = new Course("Hibernate", "Curso de hibernate", paulo);
-        Course spring = new Course("Spring", "Curso de spring", paulo);
-
-        when(courseRepository.findAll()).thenReturn(Arrays.asList(java, hibernate, spring));
+    void listAllCourses_should_return_course_list() throws Exception {
+        CourseListItemDTO expectedFirstCourse = new CourseListItemDTO(1L, "Java", "Curso de Java", CourseStatus.BUILDING);
+        CourseListItemDTO expectedLastCourse = new CourseListItemDTO(2L, "Hibernate", "Curso de Hibernate", CourseStatus.BUILDING);
+        List<CourseListItemDTO> courses = Arrays.asList(expectedFirstCourse, expectedLastCourse);
+        when(courseService.listAllCourses()).thenReturn(courses);
 
         mockMvc.perform(get("/course/all")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Java"))
-                .andExpect(jsonPath("$[0].description").value("Curso de java"))
-                .andExpect(jsonPath("$[1].title").value("Hibernate"))
-                .andExpect(jsonPath("$[1].description").value("Curso de hibernate"))
-                .andExpect(jsonPath("$[2].title").value("Spring"))
-                .andExpect(jsonPath("$[2].description").value("Curso de spring"));
+                .andExpect(jsonPath("$[0].id").value(expectedFirstCourse.id()))
+                .andExpect(jsonPath("$[0].title").value(expectedFirstCourse.title()))
+                .andExpect(jsonPath("$[0].description").value(expectedFirstCourse.description()))
+                .andExpect(jsonPath("$[0].courseStatus").value(expectedFirstCourse.courseStatus().toString()))
+                .andExpect(jsonPath("$[1].id").value(expectedLastCourse.id()))
+                .andExpect(jsonPath("$[1].title").value(expectedLastCourse.title()))
+                .andExpect(jsonPath("$[1].description").value(expectedLastCourse.description()))
+                .andExpect(jsonPath("$[1].courseStatus").value(expectedLastCourse.courseStatus().toString()));
     }
 
     @Test
-    void publishCourse__should_return_unprocessable_entity_when_course_not_exists() throws Exception {
-        Long courseIdMocked = 1L;
-        doReturn(Optional.empty()).when(courseRepository).findById(courseIdMocked);
+    void publishCourse_should_return_unprocessable_entity_when_course_not_found() throws Exception {
+        Long courseId = 1L;
+        doThrow(new CourseNotFoundException("id", "Course not found"))
+                .when(courseService).publishCourse(courseId);
 
-        mockMvc.perform(post("/course/".concat(courseIdMocked.toString()).concat("/publish")))
+        mockMvc.perform(post("/course/" + courseId + "/publish"))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.field").value("id"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 
     @Test
-    void publishCourse__should_return_unprocessable_entity_when_course_has_not_at_least_one_task_of_each_type() throws Exception {
-        Long courseIdMocked = 1L;
+    void publishCourse_should_return_unprocessable_entity_when_missing_tasks_with_other_types() throws Exception {
+        Long courseId = 1L;
+        doThrow(new MissingRequiredTaskTypesException("tasks"))
+                .when(courseService).publishCourse(courseId);
 
-        doReturn(Optional.of(mock(Course.class))).when(courseRepository).findById(courseIdMocked);
-        doReturn(false).when(taskRepository).existsAtLeatOneTaskOfEachTypeByCourseId(courseIdMocked);
-
-        mockMvc.perform(post("/course/".concat(courseIdMocked.toString()).concat("/publish")))
+        mockMvc.perform(post("/course/" + courseId + "/publish"))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.field").value("tasks"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 
     @Test
-    void publishCourse__should_return_unprocessable_entity_when_course_status_is_not_building() throws Exception {
-        Course mockedCourse =  mock(Course.class);
-        Long mockedCourseId = 1L;
+    void publishCourse_should_return_unprocessable_entity_when_not_building() throws Exception {
+        Long courseId = 1L;
+        doThrow(new CourseIsNotBuildingException("status", "Course is not in building status"))
+                .when(courseService).publishCourse(courseId);
 
-        doReturn(Optional.of(mockedCourse)).when(courseRepository).findById(mockedCourseId);
-        doReturn(true).when(taskRepository).existsAtLeatOneTaskOfEachTypeByCourseId(mockedCourseId);
-        doReturn(false).when(mockedCourse).isBuilding();
-
-        mockMvc.perform(post("/course/".concat(mockedCourseId.toString()).concat("/publish")))
+        mockMvc.perform(post("/course/" + courseId + "/publish"))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.field").value("status"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 
     @Test
-    void publishCourse__should_return_ok_when_course_is_valid_to_publish() throws Exception {
-        Course mockedCourse =  mock(Course.class);
-        Long mockedCourseId = 1L;
+    void publishCourse_should_return_ok_when_valid() throws Exception {
+        Long courseId = 1L;
 
-        doReturn(Optional.of(mockedCourse)).when(courseRepository).findById(mockedCourseId);
-        doReturn(true).when(taskRepository).existsAtLeatOneTaskOfEachTypeByCourseId(mockedCourseId);
-        doReturn(true).when(mockedCourse).isBuilding();
-
-        mockMvc.perform(post("/course/".concat(mockedCourseId.toString()).concat("/publish")))
+        mockMvc.perform(post("/course/" + courseId + "/publish"))
                 .andExpect(status().isOk());
 
-        verify(courseRepository, times(1)).save(any(Course.class));
+        verify(courseService, times(1)).publishCourse(courseId);
     }
 }
