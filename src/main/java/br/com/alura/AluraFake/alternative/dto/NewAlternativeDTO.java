@@ -6,40 +6,27 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
-public class NewAlternativeDTO {
-    @NotNull
-    @NotBlank
-    @Length(min = 4, max = 80, message = "The option length must be between 4 and 80 characters")
-    private String option;
-    @NotNull
-    @JsonProperty("isCorrect")
-    private Boolean isCorrect;
+public record NewAlternativeDTO(
+        @NotNull
+        @NotBlank
+        @Length(min = 4, max = 80, message = "The option length must be between 4 and 80 characters")
+        String option,
 
-    public NewAlternativeDTO() {}
-
-    public String getOption() {
-        return option;
-    }
-
-    public void setOption(String option) {
-        this.option = option;
-    }
-
-    @JsonProperty("isCorrect")
-    public Boolean isCorrect() {
-        return isCorrect;
-    }
+        @NotNull
+        @JsonProperty("isCorrect")
+        Boolean isCorrect
+) {
 
     @JsonIgnore
-    public Boolean isIncorrect() {
-        return !isCorrect;
+    public boolean isIncorrect() {
+        return !Boolean.TRUE.equals(isCorrect);
     }
 
-    public void setCorrect() {
-        this.isCorrect = true;
+    public NewAlternativeDTO setCorrect() {
+        return new NewAlternativeDTO(option, true);
     }
 
-    public void setIncorrect() {
-        this.isCorrect = false;
+    public NewAlternativeDTO setIncorrect() {
+        return new NewAlternativeDTO(option, false);
     }
 }

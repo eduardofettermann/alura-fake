@@ -86,7 +86,7 @@ public class TaskController {
         );
 
         List<Alternative> alternatives = newSingleChoiceTaskDTO.getOptions().stream()
-                .map(option -> new Alternative(task, option.getOption(), option.isCorrect()))
+                .map(option -> new Alternative(task, option.option(), option.isCorrect()))
                 .toList();
         task.setAlternatives(alternatives);
 
@@ -127,7 +127,7 @@ public class TaskController {
         );
 
         List<Alternative> alternatives = newMultipleChoiceTaskDTO.getOptions().stream()
-                .map(option -> new Alternative(task, option.getOption(), option.isCorrect()))
+                .map(option -> new Alternative(task, option.option(), option.isCorrect()))
                 .toList();
         task.setAlternatives(alternatives);
 
@@ -160,7 +160,7 @@ public class TaskController {
         }
 
         Set<String> optionsWithoutRepetition = options.stream()
-                .map(NewAlternativeDTO::getOption)
+                .map(NewAlternativeDTO::option)
                 .collect(Collectors.toSet());
 
         if (options.size() != optionsWithoutRepetition.size()) {
@@ -169,7 +169,7 @@ public class TaskController {
 
         String statement = newSingleChoiceTaskDTO.getStatement();
         boolean someOptionIsEqualToStatement = options.stream()
-                .anyMatch(option -> Objects.equals(option.getOption(), statement));
+                .anyMatch(option -> Objects.equals(option.option(), statement));
 
         if (someOptionIsEqualToStatement) {
             return buildErrorResponse(optionsField,
@@ -204,7 +204,7 @@ public class TaskController {
         }
 
         Set<String> optionsWithoutRepetition = options.stream()
-                .map(NewAlternativeDTO::getOption)
+                .map(NewAlternativeDTO::option)
                 .collect(Collectors.toSet());
 
         if (options.size() != optionsWithoutRepetition.size()) {
@@ -213,7 +213,7 @@ public class TaskController {
 
         String statement = newMultipleChoiceTaskDTO.getStatement();
         boolean someOptionIsEqualToStatement = options.stream()
-                .anyMatch(option -> Objects.equals(option.getOption(), statement));
+                .anyMatch(option -> Objects.equals(option.option(), statement));
 
         if (someOptionIsEqualToStatement) {
             return buildErrorResponse(optionsField,

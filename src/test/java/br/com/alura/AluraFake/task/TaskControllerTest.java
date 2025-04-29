@@ -269,15 +269,10 @@ public class TaskControllerTest {
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO alternativeWithOptionInvalid = new NewAlternativeDTO();
-        alternativeWithOptionInvalid.setCorrect();
-        alternativeWithOptionInvalid.setOption("123");
-        NewAlternativeDTO java = new NewAlternativeDTO();
-        NewAlternativeDTO spring = new NewAlternativeDTO();
-        java.setOption("Java 21");
-        spring.setOption("Spring");
+        NewAlternativeDTO alternativeWithOptionInvalid = new NewAlternativeDTO("123", true);
+        NewAlternativeDTO java = new NewAlternativeDTO("Java 21", false);
+        NewAlternativeDTO spring = new NewAlternativeDTO("Spring", false);
         java.setIncorrect();
-        spring.setIncorrect();
 
         newSingleChoiceTaskDTO.setOptions(List.of(alternativeWithOptionInvalid, java, spring));
 
@@ -302,15 +297,9 @@ public class TaskControllerTest {
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO alternativeWithOptionInvalid = new NewAlternativeDTO();
-        alternativeWithOptionInvalid.setCorrect();
-        alternativeWithOptionInvalid.setOption("fiap".repeat(21));
-        NewAlternativeDTO java = new NewAlternativeDTO();
-        NewAlternativeDTO spring = new NewAlternativeDTO();
-        java.setOption("Java 21");
-        spring.setOption("Spring");
-        java.setIncorrect();
-        spring.setIncorrect();
+        NewAlternativeDTO alternativeWithOptionInvalid = new NewAlternativeDTO("fiap".repeat(21), false);
+        NewAlternativeDTO java = new NewAlternativeDTO("Java 21", false);
+        NewAlternativeDTO spring = new NewAlternativeDTO("Spring", false);
 
         newSingleChoiceTaskDTO.setOptions(List.of(alternativeWithOptionInvalid, java, spring));
 
@@ -335,9 +324,7 @@ public class TaskControllerTest {
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO alternative = new NewAlternativeDTO();
-        alternative.setCorrect();
-        alternative.setOption("Redis");
+        NewAlternativeDTO alternative = new NewAlternativeDTO("Redis", true);
 
         newSingleChoiceTaskDTO.setOptions(List.of(alternative));
 
@@ -362,26 +349,12 @@ public class TaskControllerTest {
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO docker = new NewAlternativeDTO();
-        NewAlternativeDTO java = new NewAlternativeDTO();
-        NewAlternativeDTO spring = new NewAlternativeDTO();
-        NewAlternativeDTO elk = new NewAlternativeDTO();
-        NewAlternativeDTO aws = new NewAlternativeDTO();
-        NewAlternativeDTO oci = new NewAlternativeDTO();
-
-        docker.setOption("Docker");
-        java.setOption("Java 21");
-        spring.setOption("Spring");
-        elk.setOption("ElasticSearch, Kibana e Logstash");
-        aws.setOption("Amazon Web Services");
-        oci.setOption("Oracle Cloud Infrastructure");
-
-        docker.setCorrect();
-        java.setIncorrect();
-        spring.setIncorrect();
-        elk.setIncorrect();
-        aws.setIncorrect();
-        oci.setIncorrect();
+        NewAlternativeDTO docker = new NewAlternativeDTO("Docker", true);
+        NewAlternativeDTO java = new NewAlternativeDTO("Java 21", false);
+        NewAlternativeDTO spring = new NewAlternativeDTO("Spring", false);
+        NewAlternativeDTO elk = new NewAlternativeDTO("ElasticSearch, Kibana e Logstash", false);
+        NewAlternativeDTO aws = new NewAlternativeDTO("Amazon Web Services", false);
+        NewAlternativeDTO oci = new NewAlternativeDTO("Oracle Cloud Infrastructure", false);
 
         newSingleChoiceTaskDTO.setOptions(List.of(docker, java, spring, elk, aws, oci));
 
@@ -406,14 +379,8 @@ public class TaskControllerTest {
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO apiRest = new NewAlternativeDTO();
-        NewAlternativeDTO bestPractices = new NewAlternativeDTO();
-
-        apiRest.setOption("API REST");
-        bestPractices.setOption("Boas práticas");
-
-        apiRest.setCorrect();
-        bestPractices.setCorrect();
+        NewAlternativeDTO apiRest = new NewAlternativeDTO("API REST", true);
+        NewAlternativeDTO bestPractices = new NewAlternativeDTO("Boas práticas", true);
 
         newSingleChoiceTaskDTO.setOptions(List.of(apiRest, bestPractices));
 
@@ -438,14 +405,8 @@ public class TaskControllerTest {
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO solid = new NewAlternativeDTO();
-        NewAlternativeDTO duplicatedSolid = new NewAlternativeDTO();
-
-        solid.setOption("Solid");
-        duplicatedSolid.setOption(solid.getOption());
-
-        solid.setCorrect();
-        duplicatedSolid.setIncorrect();
+        NewAlternativeDTO solid = new NewAlternativeDTO("Solid", true);
+        NewAlternativeDTO duplicatedSolid = new NewAlternativeDTO(solid.option(), false);
 
         newSingleChoiceTaskDTO.setOptions(List.of(solid, duplicatedSolid));
         doReturn(Optional.of(course)).when(courseRepository).findById(newSingleChoiceTaskDTO.getCourseId());
@@ -469,14 +430,8 @@ public class TaskControllerTest {
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("Fazer deploy com Github Actions");
 
-        NewAlternativeDTO deploy = new NewAlternativeDTO();
-        NewAlternativeDTO codeReview = new NewAlternativeDTO();
-
-        deploy.setOption("Fazer deploy com Github Actions");
-        codeReview.setOption("Code review");
-
-        deploy.setCorrect();
-        codeReview.setIncorrect();
+        NewAlternativeDTO deploy = new NewAlternativeDTO("Fazer deploy com Github Actions", true);
+        NewAlternativeDTO codeReview = new NewAlternativeDTO("Code review", false);
 
         newSingleChoiceTaskDTO.setOptions(List.of(deploy, codeReview));
         doReturn(Optional.of(course)).when(courseRepository).findById(newSingleChoiceTaskDTO.getCourseId());
@@ -500,14 +455,8 @@ public class TaskControllerTest {
         newSingleChoiceTaskDTO.setOrder(1);
         newSingleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO tdd = new NewAlternativeDTO();
-        NewAlternativeDTO rabbitMQ = new NewAlternativeDTO();
-
-        tdd.setOption("Desenvolvimento orientado a testes");
-        rabbitMQ.setOption("RabbitMQ");
-
-        tdd.setCorrect();
-        rabbitMQ.setIncorrect();
+        NewAlternativeDTO tdd = new NewAlternativeDTO("Desenvolvimento orientado a testes", true);
+        NewAlternativeDTO rabbitMQ = new NewAlternativeDTO("RabbitMQ", false);
 
         newSingleChoiceTaskDTO.setOptions(List.of(tdd, rabbitMQ));
         doReturn(Optional.of(course)).when(courseRepository).findById(newSingleChoiceTaskDTO.getCourseId());
@@ -534,13 +483,9 @@ public class TaskControllerTest {
         newMultipleChoiceTaskDTO.setOrder(1);
         newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO alternativeWithOptionInvalid = new NewAlternativeDTO();
-        NewAlternativeDTO java = new NewAlternativeDTO();
-        NewAlternativeDTO spring = new NewAlternativeDTO();
-
-        alternativeWithOptionInvalid.setOption("123");
-        java.setOption("Java 21");
-        spring.setOption("Spring");
+        NewAlternativeDTO alternativeWithOptionInvalid = new NewAlternativeDTO("123", false);
+        NewAlternativeDTO java = new NewAlternativeDTO("Java 21", true);
+        NewAlternativeDTO spring = new NewAlternativeDTO("Spring", true);
 
         alternativeWithOptionInvalid.setIncorrect();
         java.setCorrect();
@@ -569,13 +514,9 @@ public class TaskControllerTest {
         newMultipleChoiceTaskDTO.setOrder(1);
         newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO alternativeWithOptionInvalid = new NewAlternativeDTO();
-        NewAlternativeDTO java = new NewAlternativeDTO();
-        NewAlternativeDTO spring = new NewAlternativeDTO();
-
-        alternativeWithOptionInvalid.setOption("caelum".repeat(14));
-        java.setOption("Java 21");
-        spring.setOption("Spring");
+        NewAlternativeDTO alternativeWithOptionInvalid = new NewAlternativeDTO("caelum".repeat(14), false);
+        NewAlternativeDTO java = new NewAlternativeDTO("Java 21", true);
+        NewAlternativeDTO spring = new NewAlternativeDTO("Spring", true);
 
         alternativeWithOptionInvalid.setIncorrect();
         java.setCorrect();
@@ -604,14 +545,8 @@ public class TaskControllerTest {
         newMultipleChoiceTaskDTO.setOrder(1);
         newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO alternative = new NewAlternativeDTO();
-        NewAlternativeDTO otherAlternative = new NewAlternativeDTO();
-
-        alternative.setOption("Redis");
-        otherAlternative.setOption("MySQL");
-
-        alternative.setCorrect();
-        otherAlternative.setIncorrect();
+        NewAlternativeDTO alternative = new NewAlternativeDTO("Redis", true);
+        NewAlternativeDTO otherAlternative = new NewAlternativeDTO("MySQL", false);
 
         newMultipleChoiceTaskDTO.setOptions(List.of(alternative, otherAlternative));
 
@@ -636,26 +571,12 @@ public class TaskControllerTest {
         newMultipleChoiceTaskDTO.setOrder(1);
         newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO java = new NewAlternativeDTO();
-        NewAlternativeDTO spring = new NewAlternativeDTO();
-        NewAlternativeDTO docker = new NewAlternativeDTO();
-        NewAlternativeDTO elk = new NewAlternativeDTO();
-        NewAlternativeDTO aws = new NewAlternativeDTO();
-        NewAlternativeDTO oci = new NewAlternativeDTO();
-
-        java.setOption("Java 21");
-        spring.setOption("Spring");
-        docker.setOption("Docker");
-        elk.setOption("ElasticSearch, Kibana e Logstash");
-        aws.setOption("Amazon Web Services");
-        oci.setOption("Oracle Cloud Infrastructure");
-
-        java.setCorrect();
-        spring.setCorrect();
-        docker.setIncorrect();
-        elk.setIncorrect();
-        aws.setIncorrect();
-        oci.setIncorrect();
+        NewAlternativeDTO java = new NewAlternativeDTO("Java 21",true);
+        NewAlternativeDTO spring = new NewAlternativeDTO("Spring", true);
+        NewAlternativeDTO docker = new NewAlternativeDTO("Docker", false);
+        NewAlternativeDTO elk = new NewAlternativeDTO("ElasticSearch, Kibana e Logstash", false);
+        NewAlternativeDTO aws = new NewAlternativeDTO("Amazon Web Services", false);
+        NewAlternativeDTO oci = new NewAlternativeDTO("Oracle Cloud Infrastructure", false);
 
         newMultipleChoiceTaskDTO.setOptions(List.of(docker, java, spring, elk, aws, oci));
 
@@ -680,17 +601,9 @@ public class TaskControllerTest {
         newMultipleChoiceTaskDTO.setOrder(1);
         newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO tdd = new NewAlternativeDTO();
-        NewAlternativeDTO junit = new NewAlternativeDTO();
-        NewAlternativeDTO mockito = new NewAlternativeDTO();
-
-        tdd.setOption("Desenvolvimento orientado a testes");
-        junit.setOption("JUnit 5");
-        mockito.setOption("Mockito");
-
-        tdd.setCorrect();
-        junit.setCorrect();
-        mockito.setCorrect();
+        NewAlternativeDTO tdd = new NewAlternativeDTO("Desenvolvimento orientado a testes", true);
+        NewAlternativeDTO junit = new NewAlternativeDTO("JUnit 5", true);
+        NewAlternativeDTO mockito = new NewAlternativeDTO("Mockito", true);
 
         newMultipleChoiceTaskDTO.setOptions(List.of(tdd, junit, mockito));
 
@@ -715,17 +628,9 @@ public class TaskControllerTest {
         newMultipleChoiceTaskDTO.setOrder(1);
         newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO solid = new NewAlternativeDTO();
-        NewAlternativeDTO duplicatedSolid = new NewAlternativeDTO();
-        NewAlternativeDTO otherDuplicatedSolid = new NewAlternativeDTO();
-
-        solid.setOption("Solid");
-        duplicatedSolid.setOption(solid.getOption());
-        otherDuplicatedSolid.setOption(solid.getOption());
-
-        solid.setCorrect();
-        duplicatedSolid.setCorrect();
-        otherDuplicatedSolid.setIncorrect();
+        NewAlternativeDTO solid = new NewAlternativeDTO("Solid", true);
+        NewAlternativeDTO duplicatedSolid = new NewAlternativeDTO(solid.option(), true);
+        NewAlternativeDTO otherDuplicatedSolid = new NewAlternativeDTO(solid.option(), false);
 
         newMultipleChoiceTaskDTO.setOptions(List.of(solid, duplicatedSolid, otherDuplicatedSolid));
         doReturn(Optional.of(course)).when(courseRepository).findById(newMultipleChoiceTaskDTO.getCourseId());
@@ -749,17 +654,9 @@ public class TaskControllerTest {
         newMultipleChoiceTaskDTO.setOrder(1);
         newMultipleChoiceTaskDTO.setStatement("Fazer deploy com Github Actions");
 
-        NewAlternativeDTO deploy = new NewAlternativeDTO();
-        NewAlternativeDTO codeReview = new NewAlternativeDTO();
-        NewAlternativeDTO pairProgramming = new NewAlternativeDTO();
-
-        deploy.setOption("Fazer deploy com Github Actions");
-        codeReview.setOption("Code review");
-        pairProgramming.setOption("Pair programming");
-
-        deploy.setCorrect();
-        codeReview.setIncorrect();
-        pairProgramming.setCorrect();
+        NewAlternativeDTO codeReview = new NewAlternativeDTO("Code review", false);
+        NewAlternativeDTO deploy = new NewAlternativeDTO("Fazer deploy com Github Actions", true);
+        NewAlternativeDTO pairProgramming = new NewAlternativeDTO("Pair programming", true);
 
         newMultipleChoiceTaskDTO.setOptions(List.of(deploy, codeReview, pairProgramming));
         doReturn(Optional.of(course)).when(courseRepository).findById(newMultipleChoiceTaskDTO.getCourseId());
@@ -783,23 +680,11 @@ public class TaskControllerTest {
         newMultipleChoiceTaskDTO.setOrder(1);
         newMultipleChoiceTaskDTO.setStatement("O que aprendemos hoje?");
 
-        NewAlternativeDTO tdd = new NewAlternativeDTO();
-        NewAlternativeDTO rabbitMQ = new NewAlternativeDTO();
-        NewAlternativeDTO eda = new NewAlternativeDTO();
-        NewAlternativeDTO springSecurity = new NewAlternativeDTO();
-        NewAlternativeDTO springCloud = new NewAlternativeDTO();
-
-        tdd.setOption("Desenvolvimento orientado a testes");
-        rabbitMQ.setOption("RabbitMQ");
-        eda.setOption("Arquitetura orientada a eventos");
-        springSecurity.setOption("Spring Security");
-        springCloud.setOption("Spring Cloud");
-
-        rabbitMQ.setCorrect();
-        eda.setCorrect();
-        tdd.setIncorrect();
-        springSecurity.setIncorrect();
-        springCloud.setIncorrect();
+        NewAlternativeDTO rabbitMQ = new NewAlternativeDTO("RabbitMQ", true);
+        NewAlternativeDTO eda = new NewAlternativeDTO("Arquitetura orientada a eventos", true);
+        NewAlternativeDTO tdd = new NewAlternativeDTO("Desenvolvimento orientado a testes", false);
+        NewAlternativeDTO springSecurity = new NewAlternativeDTO("Spring Security", false);
+        NewAlternativeDTO springCloud = new NewAlternativeDTO("Spring Cloud", false);
 
         newMultipleChoiceTaskDTO.setOptions(List.of(tdd, rabbitMQ, eda, springSecurity, springCloud));
         doReturn(Optional.of(course)).when(courseRepository).findById(newMultipleChoiceTaskDTO.getCourseId());
