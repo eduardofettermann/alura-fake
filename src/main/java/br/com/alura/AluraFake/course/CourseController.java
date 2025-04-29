@@ -35,7 +35,7 @@ public class CourseController {
 
         //Caso implemente o bonus, pegue o instrutor logado
         Optional<User> possibleAuthor = userRepository
-                .findByEmail(newCourse.getEmailInstructor())
+                .findByEmail(newCourse.emailInstructor())
                 .filter(User::isInstructor);
 
         if(possibleAuthor.isEmpty()) {
@@ -43,7 +43,7 @@ public class CourseController {
                     .body(new ErrorItemDTO("emailInstructor", "Usuário não é um instrutor"));
         }
 
-        Course course = new Course(newCourse.getTitle(), newCourse.getDescription(), possibleAuthor.get());
+        Course course = new Course(newCourse.title(), newCourse.description(), possibleAuthor.get());
 
         courseRepository.save(course);
         return ResponseEntity.status(HttpStatus.CREATED).build();

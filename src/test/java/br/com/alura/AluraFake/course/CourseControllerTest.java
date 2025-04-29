@@ -40,13 +40,10 @@ class CourseControllerTest {
     @Test
     void newCourseDTO__should_return_bad_request_when_email_is_invalid() throws Exception {
 
-        NewCourseDTO newCourseDTO = new NewCourseDTO();
-        newCourseDTO.setTitle("Java");
-        newCourseDTO.setDescription("Curso de Java");
-        newCourseDTO.setEmailInstructor("paulo@alura.com.br");
+        NewCourseDTO newCourseDTO = new NewCourseDTO("Java", "Java", "paulo@alura.com.br");
 
         doReturn(Optional.empty()).when(userRepository)
-                .findByEmail(newCourseDTO.getEmailInstructor());
+                .findByEmail(newCourseDTO.emailInstructor());
 
         mockMvc.perform(post("/course/new")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -60,16 +57,13 @@ class CourseControllerTest {
     @Test
     void newCourseDTO__should_return_bad_request_when_email_is_no_instructor() throws Exception {
 
-        NewCourseDTO newCourseDTO = new NewCourseDTO();
-        newCourseDTO.setTitle("Java");
-        newCourseDTO.setDescription("Curso de Java");
-        newCourseDTO.setEmailInstructor("paulo@alura.com.br");
+        NewCourseDTO newCourseDTO = new NewCourseDTO("Java", "Java", "paulo@alura.com.br");
 
         User user = mock(User.class);
         doReturn(false).when(user).isInstructor();
 
         doReturn(Optional.of(user)).when(userRepository)
-                .findByEmail(newCourseDTO.getEmailInstructor());
+                .findByEmail(newCourseDTO.emailInstructor());
 
         mockMvc.perform(post("/course/new")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -82,15 +76,12 @@ class CourseControllerTest {
     @Test
     void newCourseDTO__should_return_created_when_new_course_request_is_valid() throws Exception {
 
-        NewCourseDTO newCourseDTO = new NewCourseDTO();
-        newCourseDTO.setTitle("Java");
-        newCourseDTO.setDescription("Curso de Java");
-        newCourseDTO.setEmailInstructor("paulo@alura.com.br");
+        NewCourseDTO newCourseDTO = new NewCourseDTO("Java", "Java", "paulo@alura.com.br");
 
         User user = mock(User.class);
         doReturn(true).when(user).isInstructor();
 
-        doReturn(Optional.of(user)).when(userRepository).findByEmail(newCourseDTO.getEmailInstructor());
+        doReturn(Optional.of(user)).when(userRepository).findByEmail(newCourseDTO.emailInstructor());
 
         mockMvc.perform(post("/course/new")
                         .contentType(MediaType.APPLICATION_JSON)
