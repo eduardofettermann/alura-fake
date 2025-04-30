@@ -3,7 +3,7 @@ package br.com.alura.AluraFake.task;
 import br.com.alura.AluraFake.course.model.Course;
 import br.com.alura.AluraFake.course.CourseRepository;
 import br.com.alura.AluraFake.task.model.Task;
-import br.com.alura.AluraFake.user.model.Role;
+import br.com.alura.AluraFake.user.model.UserRole;
 import br.com.alura.AluraFake.user.model.User;
 import br.com.alura.AluraFake.user.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class TaskRepositoryTest {
 
     @Test
     void findAllByCourseId__should_return_tasks_with_course_id() {
-        User user = new User("Eduardo", "eduardofettermann212@gmail.com", Role.INSTRUCTOR);
+        User user = new User("Eduardo", "eduardofettermann212@gmail.com", UserRole.INSTRUCTOR);
         Course course = new Course(
                 "Object Calisthenics em Java ",
                 "Aprofunde-se em boas práticas de POO com Alura",
@@ -56,7 +56,7 @@ class TaskRepositoryTest {
 
     @Test
     void existsTasksByCourseIdAndByStatement__should_return_true_when_exists_tasks_with_the_course_id_and_statement() {
-        User user = new User("Eduardo", "eduardofettermann212@gmail.com", Role.INSTRUCTOR);
+        User user = new User("Eduardo", "eduardofettermann212@gmail.com", UserRole.INSTRUCTOR);
         Course course = new Course(
                 "Object Calisthenics em Java ",
                 "Aprofunde-se em boas práticas de POO com Alura",
@@ -82,7 +82,7 @@ class TaskRepositoryTest {
 
     @Test
     void findMaxOrderByCourseId__should_return_highest_task_order() {
-        User user = new User("Eduardo", "eduardofettermann212@gmail.com", Role.INSTRUCTOR);
+        User user = new User("Eduardo", "eduardofettermann212@gmail.com", UserRole.INSTRUCTOR);
         Course course = new Course(
                 "Object Calisthenics em Java ",
                 "Aprofunde-se em boas práticas de POO com Alura",
@@ -111,7 +111,7 @@ class TaskRepositoryTest {
 
     @Test
     void existsTasksByCourseIdAndByOrder__should_return_true_when_already_has_task_with_course_id_and_order() {
-        User user = new User("Eduardo", "eduardofettermann212@gmail.com", Role.INSTRUCTOR);
+        User user = new User("Eduardo", "eduardofettermann212@gmail.com", UserRole.INSTRUCTOR);
         Course course = new Course(
                 "Object Calisthenics em Java ",
                 "Aprofunde-se em boas práticas de POO com Alura",
@@ -138,7 +138,7 @@ class TaskRepositoryTest {
     }
     @Test
     void findByCourseIdAndOrderGreaterThanEqualForUpdate__should_return_tasks_with_greater_or_equal_order() {
-        User user = new User("Eduardo", "eduardofettermann212@gmail.com", Role.INSTRUCTOR);
+        User user = new User("Eduardo", "eduardofettermann212@gmail.com", UserRole.INSTRUCTOR);
         Course course = new Course(
                 "Object Calisthenics em Java ",
                 "Aprofunde-se em boas práticas de POO com Alura",
@@ -174,7 +174,7 @@ class TaskRepositoryTest {
 
     @Test
     void existsAtLeatOneTaskOfEachTypeByCourseId__should_return_if_course_has_at_least_one_task_of_each_type() {
-        User user = new User("Eduardo", "eduardofettermann212@gmail.com", Role.INSTRUCTOR);
+        User user = new User("Eduardo", "eduardofettermann212@gmail.com", UserRole.INSTRUCTOR);
         Course course = new Course(
                 "Object Calisthenics em Java ",
                 "Aprofunde-se em boas práticas de POO com Alura",

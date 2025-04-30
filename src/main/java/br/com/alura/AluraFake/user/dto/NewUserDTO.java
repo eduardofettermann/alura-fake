@@ -1,6 +1,6 @@
 package br.com.alura.AluraFake.user.dto;
 
-import br.com.alura.AluraFake.user.model.Role;
+import br.com.alura.AluraFake.user.model.UserRole;
 import br.com.alura.AluraFake.user.model.User;
 import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.Length;
@@ -15,7 +15,7 @@ public record NewUserDTO(
         String email,
 
         @NotNull
-        Role role,
+        UserRole role,
 
         @Pattern(regexp = "^$|^.{6}$", message = "Password must be exactly 6 characters long if provided")
         String password

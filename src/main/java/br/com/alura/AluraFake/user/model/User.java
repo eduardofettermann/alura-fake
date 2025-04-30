@@ -5,53 +5,40 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-@Entity
+@NoArgsConstructor
 public class User implements UserDetails{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Getter
+    private final LocalDateTime createdAt = LocalDateTime.now();
+    @Getter
     private String name;
+    @Getter
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private UserRole role;
+    @Getter
     private String email;
     // Por questões didáticas, a senha será armazenada em texto plano.
+    @Getter
     private String password;
 
-    @Deprecated
-    public User() {}
-
-    public User(String name, String email, Role role, String password) {
+    public User(String name, String email, UserRole role, String password) {
         this.name = name;
         this.role = role;
         this.email = email;
         this.password = password;
     }
 
-    public User(String name, String email, Role role) {
+    public User(String name, String email, UserRole role) {
         this(name, email, role, PasswordGeneration.generatePassword());
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Role getRole() {
-        return role;
     }
 
     public boolean isInstructor() {
@@ -65,6 +52,7 @@ public class User implements UserDetails{
 
     public String getPassword() {
         return password;
+
     }
 
     @Override
