@@ -1,15 +1,22 @@
 package br.com.alura.AluraFake.user;
 
+import br.com.alura.AluraFake.AluraFakeApplication;
 import br.com.alura.AluraFake.exception.domain.DuplicateUserEmailException;
+import br.com.alura.AluraFake.infra.security.SecurityConfiguration;
+import br.com.alura.AluraFake.infra.security.TokenService;
 import br.com.alura.AluraFake.user.dto.NewUserDTO;
 import br.com.alura.AluraFake.user.dto.UserListItemDTO;
 import br.com.alura.AluraFake.user.model.UserRole;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -20,6 +27,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ExtendWith(value = SpringExtension.class)
+@ContextConfiguration(classes = {
+        AluraFakeApplication.class,
+        SecurityConfiguration.class}
+)
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
 
@@ -29,9 +41,16 @@ public class UserControllerTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private TokenService tokenService;
+
+    @MockBean
+    private UserRepository userRepository;
+
     @Autowired
     private ObjectMapper objectMapper;
 
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newUser__should_return_bad_request_when_email_is_blank() throws Exception {
         NewUserDTO newUserDTO = new NewUserDTO("John Doe", "john.doe@example.com", UserRole.STUDENT, null);
@@ -44,6 +63,7 @@ public class UserControllerTest {
         verify(userService, times(1)).newStudent(newUserDTO);
     }
 
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newUser__should_return_bad_request_when_email_is_invalid() throws Exception {
         NewUserDTO newUserDTO = new NewUserDTO("John Doe", "invalid-email", UserRole.STUDENT, null);
@@ -56,6 +76,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[0].message").isNotEmpty());
     }
 
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newUser__should_return_unprocessable_entity_when_email_already_exists() throws Exception {
         NewUserDTO newUserDTO = new NewUserDTO("John Doe", "john.doe@example.com", UserRole.STUDENT, null);
@@ -69,6 +90,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void listAllUsers__should_return_ok_and_list_users() throws Exception {
         UserListItemDTO user1 = new UserListItemDTO("John Doe", "john.doe@example.com", UserRole.STUDENT);
