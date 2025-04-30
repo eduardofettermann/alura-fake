@@ -111,7 +111,7 @@ public class TaskServiceTest {
     void newOpenTextExercise__should_throw_duplicate_task_statement_in_exception_when_statement_is_duplicated_by_course_id() {
         NewOpenTextTaskDTO newOpenTextTaskDTO = getValidNewOpenTextTaskDTO();
 
-        when(courseRepository.findById(newOpenTextTaskDTO.getCourseId())).thenReturn(Optional.of(getValidCourse()));;
+        when(courseRepository.findById(newOpenTextTaskDTO.getCourseId())).thenReturn(Optional.of(getValidCourse()));
         when(taskRepository.existsTasksByCourseIdAndByStatement(
                 newOpenTextTaskDTO.getCourseId(),
                 newOpenTextTaskDTO.getStatement()
@@ -204,7 +204,7 @@ public class TaskServiceTest {
     void newOpenTextExercise__should_save_task_when_dto_is_valid() {
         NewOpenTextTaskDTO newOpenTextTaskDTO = getValidNewOpenTextTaskDTO();
 
-        when(courseRepository.findById(newOpenTextTaskDTO.getCourseId())).thenReturn(Optional.of(getValidCourse()));;
+        when(courseRepository.findById(newOpenTextTaskDTO.getCourseId())).thenReturn(Optional.of(getValidCourse()));
         doReturn(null).when(taskRepository).findHighestOrderByCourseId(newOpenTextTaskDTO.getCourseId());
         taskService.newOpenTextExercise(newOpenTextTaskDTO);
 
