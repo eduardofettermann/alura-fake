@@ -1,3 +1,23 @@
+# Solução do Case Técnico Alura💙
+
+## Executando o projeto
+Execute o projeto na sua IDE: Se você estiver utilizando uma IDE como IntelliJ ou Eclipse, basta clicar para executar a aplicação Spring Boot. Certifique-se de que o main esteja configurado corretamente para iniciar o aplicativo.
+
+Ou via linha de comando: Se preferir, pode executar o projeto via terminal utilizando Maven ou Gradle:
+
+```
+./mvnw spring-boot:run
+```
+
+## Acessando o Swagger UI
+Uma vez que o projeto esteja em execução, você poderá acessar a documentação Swagger na seguinte URL:
+
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
+# Instruções recebidas:
+
 # Case Tecnico Alura
 Seja bem-vindo ao teste para desenvolvedor Java Júnior da Alura. Neste
 desafio, simulamos uma parte do nosso domínio para que você possa demonstrar seus conhecimentos. 
