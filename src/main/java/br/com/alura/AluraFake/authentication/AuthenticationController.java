@@ -26,7 +26,7 @@ public class AuthenticationController {
     public ResponseEntity<UserLoginResponseDTO> login(@RequestBody @Valid UserAuthenticationDTO userAuthenticationDTO) throws EmailOrPasswordInvalidException {
         Optional<UserLoginResponseDTO> userLoginResponseDTO = authenticationService.login(userAuthenticationDTO);
         if (userLoginResponseDTO.isPresent()) {
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body(userLoginResponseDTO.get());
         }
 
         return ResponseEntity
