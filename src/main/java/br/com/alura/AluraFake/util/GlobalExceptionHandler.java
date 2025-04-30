@@ -1,7 +1,11 @@
 package br.com.alura.AluraFake.util;
 
 import br.com.alura.AluraFake.exception.DomainException;
+import br.com.alura.AluraFake.exception.EmailAlreadyRegisteredException;
+import br.com.alura.AluraFake.exception.EmailOrPasswordInvalidException;
 import br.com.alura.AluraFake.exception.ForbiddenException;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -33,5 +37,26 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorItemDTO> handleForbiddenException(ForbiddenException ex) {
         ErrorItemDTO error = new ErrorItemDTO(ex.getField(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler({JWTCreationException.class, JWTVerificationException.class})
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<ErrorItemDTO> handleJWTCreationException(RuntimeException ex) {
+        ErrorItemDTO error = new ErrorItemDTO("token", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(EmailAlreadyRegisteredException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<ErrorItemDTO> handleEmailAlreadyRegisteredException(EmailAlreadyRegisteredException ex) {
+        ErrorItemDTO error = new ErrorItemDTO(ex.getField(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(EmailOrPasswordInvalidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorItemDTO> handleEmailAlreadyRegisteredException(EmailOrPasswordInvalidException ex) {
+        ErrorItemDTO error = new ErrorItemDTO(ex.getField(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 }

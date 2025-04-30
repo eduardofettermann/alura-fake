@@ -1,5 +1,6 @@
 package br.com.alura.AluraFake.course;
 
+import br.com.alura.AluraFake.AluraFakeApplication;
 import br.com.alura.AluraFake.course.dto.CourseListItemDTO;
 import br.com.alura.AluraFake.course.dto.NewCourseDTO;
 import br.com.alura.AluraFake.course.model.CourseStatus;
@@ -7,12 +8,19 @@ import br.com.alura.AluraFake.exception.domain.CourseIsNotBuildingException;
 import br.com.alura.AluraFake.exception.domain.CourseNotFoundException;
 import br.com.alura.AluraFake.exception.domain.MissingRequiredTaskTypesException;
 import br.com.alura.AluraFake.exception.forbidden.NotAnInstructorException;
+import br.com.alura.AluraFake.infra.security.SecurityConfiguration;
+import br.com.alura.AluraFake.infra.security.TokenService;
+import br.com.alura.AluraFake.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -24,6 +32,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ExtendWith(value = SpringExtension.class)
+@ContextConfiguration(classes = {
+        AluraFakeApplication.class,
+        SecurityConfiguration.class}
+)
 @WebMvcTest(CourseController.class)
 class CourseControllerTest {
 
@@ -33,9 +46,16 @@ class CourseControllerTest {
     @MockBean
     private CourseService courseService;
 
+    @MockBean
+    private TokenService tokenService;
+
+    @MockBean
+    private UserRepository userRepository;
+
     @Autowired
     private ObjectMapper objectMapper;
 
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void createCourse_should_return_bad_request_when_dto_is_invalid() throws Exception {
         NewCourseDTO invalidCourse = new NewCourseDTO("Java", "Java", "invalid-email");
@@ -48,6 +68,7 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$[0].message").isNotEmpty());
     }
 
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void createCourse_should_return_forbidden_when_instructor_not_found() throws Exception {
         NewCourseDTO newCourse = new NewCourseDTO("Java", "Java", "paulo@alura.com.br");
@@ -63,6 +84,7 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void createCourse_should_return_created_when_valid() throws Exception {
         NewCourseDTO newCourse = new NewCourseDTO("Java", "Java", "paulo@alura.com.br");
@@ -75,6 +97,7 @@ class CourseControllerTest {
         verify(courseService, times(1)).createCourse(any(NewCourseDTO.class));
     }
 
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void listAllCourses_should_return_course_list() throws Exception {
         CourseListItemDTO expectedFirstCourse = new CourseListItemDTO(1L, "Java", "Curso de Java", CourseStatus.BUILDING);
@@ -95,6 +118,7 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$[1].status").value(expectedLastCourse.status().toString()));
     }
 
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void publishCourse_should_return_unprocessable_entity_when_course_not_found() throws Exception {
         Long courseId = 1L;
@@ -107,6 +131,7 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void publishCourse_should_return_unprocessable_entity_when_missing_tasks_with_other_types() throws Exception {
         Long courseId = 1L;
@@ -119,6 +144,7 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void publishCourse_should_return_unprocessable_entity_when_not_building() throws Exception {
         Long courseId = 1L;
@@ -131,6 +157,7 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void publishCourse_should_return_ok_when_valid() throws Exception {
         Long courseId = 1L;

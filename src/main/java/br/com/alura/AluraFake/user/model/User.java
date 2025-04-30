@@ -2,14 +2,17 @@ package br.com.alura.AluraFake.user.model;
 
 import br.com.alura.AluraFake.util.PasswordGeneration;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
-@Entity
 @NoArgsConstructor
-public class User {
+public class User implements UserDetails{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,6 +42,41 @@ public class User {
     }
 
     public boolean isInstructor() {
-        return UserRole.INSTRUCTOR.equals(this.role);
+        return Role.INSTRUCTOR.equals(this.role);
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+    }
+
+    public String getPassword() {
+        return password;
+
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
