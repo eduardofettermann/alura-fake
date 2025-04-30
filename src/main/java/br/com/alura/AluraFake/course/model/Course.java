@@ -2,11 +2,13 @@ package br.com.alura.AluraFake.course.model;
 
 import br.com.alura.AluraFake.user.model.User;
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 
 @Entity
+@NoArgsConstructor
 public class Course {
 
     @Id
@@ -21,9 +23,6 @@ public class Course {
     @Enumerated(EnumType.STRING)
     private CourseStatus status;
     private LocalDateTime publishedAt;
-
-    @Deprecated
-    public Course(){}
 
     public Course(String title, String description, User instructor) {
         Assert.isTrue(instructor.isInstructor(), "Usuario deve ser um instrutor");

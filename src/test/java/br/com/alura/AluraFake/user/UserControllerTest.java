@@ -6,7 +6,7 @@ import br.com.alura.AluraFake.infra.security.SecurityConfiguration;
 import br.com.alura.AluraFake.infra.security.TokenService;
 import br.com.alura.AluraFake.user.dto.NewUserDTO;
 import br.com.alura.AluraFake.user.dto.UserListItemDTO;
-import br.com.alura.AluraFake.user.model.Role;
+import br.com.alura.AluraFake.user.model.UserRole;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +53,7 @@ public class UserControllerTest {
     @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newUser__should_return_bad_request_when_email_is_blank() throws Exception {
-        NewUserDTO newUserDTO = new NewUserDTO("John Doe", "john.doe@example.com", Role.STUDENT, null);
+        NewUserDTO newUserDTO = new NewUserDTO("John Doe", "john.doe@example.com", UserRole.STUDENT, null);
 
         mockMvc.perform(post("/user/new")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -66,7 +66,7 @@ public class UserControllerTest {
     @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newUser__should_return_bad_request_when_email_is_invalid() throws Exception {
-        NewUserDTO newUserDTO = new NewUserDTO("John Doe", "invalid-email", Role.STUDENT, null);
+        NewUserDTO newUserDTO = new NewUserDTO("John Doe", "invalid-email", UserRole.STUDENT, null);
 
         mockMvc.perform(post("/user/new")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -79,7 +79,7 @@ public class UserControllerTest {
     @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newUser__should_return_unprocessable_entity_when_email_already_exists() throws Exception {
-        NewUserDTO newUserDTO = new NewUserDTO("John Doe", "john.doe@example.com", Role.STUDENT, null);
+        NewUserDTO newUserDTO = new NewUserDTO("John Doe", "john.doe@example.com", UserRole.STUDENT, null);
         doThrow(new DuplicateUserEmailException("email")).when(userService).newStudent(newUserDTO);
 
         mockMvc.perform(post("/user/new")
@@ -93,8 +93,8 @@ public class UserControllerTest {
     @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void listAllUsers__should_return_ok_and_list_users() throws Exception {
-        UserListItemDTO user1 = new UserListItemDTO("John Doe", "john.doe@example.com", Role.STUDENT);
-        UserListItemDTO user2 = new UserListItemDTO("Jane Doe", "jane.doe@example.com", Role.STUDENT);
+        UserListItemDTO user1 = new UserListItemDTO("John Doe", "john.doe@example.com", UserRole.STUDENT);
+        UserListItemDTO user2 = new UserListItemDTO("Jane Doe", "jane.doe@example.com", UserRole.STUDENT);
         when(userService.listAllUsers()).thenReturn(List.of(user1, user2));
 
         mockMvc.perform(get("/user/all")

@@ -9,7 +9,7 @@ import br.com.alura.AluraFake.exception.domain.MissingRequiredTaskTypesException
 import br.com.alura.AluraFake.exception.forbidden.NotAnInstructorException;
 import br.com.alura.AluraFake.task.TaskRepository;
 import br.com.alura.AluraFake.user.UserRepository;
-import br.com.alura.AluraFake.user.model.Role;
+import br.com.alura.AluraFake.user.model.UserRole;
 import br.com.alura.AluraFake.user.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,13 +45,13 @@ public class CourseServiceTest {
 
     @BeforeEach
     void setUp() {
-        instructor = new User("Paulo", "paulo@alura.com.br", Role.INSTRUCTOR);
+        instructor = new User("Paulo", "paulo@alura.com.br", UserRole.INSTRUCTOR);
         newCourseDTO = new NewCourseDTO("Java", "Curso de Java", "paulo@alura.com.br");
     }
 
     @Test
     void createCourse_should_throw_not_an_instructor_exception_when_user_is_not_instructor() {
-        when(userRepository.findByEmail(newCourseDTO.emailInstructor())).thenReturn(Optional.of(new User("Paulo", "paulo@alura.com.br", Role.STUDENT)));
+        when(userRepository.findByEmail(newCourseDTO.emailInstructor())).thenReturn(Optional.of(new User("Paulo", "paulo@alura.com.br", UserRole.STUDENT)));
 
         assertThrows(NotAnInstructorException.class, () -> courseService.createCourse(newCourseDTO));
         verify(courseRepository, never()).save(any(Course.class));

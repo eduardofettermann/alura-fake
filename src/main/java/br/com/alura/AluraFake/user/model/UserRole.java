@@ -1,6 +1,6 @@
 package br.com.alura.AluraFake.user.model;
 
-public enum Role {
+public enum UserRole {
     STUDENT,
     INSTRUCTOR
 }

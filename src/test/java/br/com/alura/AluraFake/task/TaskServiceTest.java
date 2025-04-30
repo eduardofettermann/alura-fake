@@ -11,7 +11,7 @@ import br.com.alura.AluraFake.task.dto.NewSingleChoiceTaskDTO;
 import br.com.alura.AluraFake.task.dto.TaskListItemDTO;
 import br.com.alura.AluraFake.task.model.Task;
 import br.com.alura.AluraFake.task.model.TaskType;
-import br.com.alura.AluraFake.user.model.Role;
+import br.com.alura.AluraFake.user.model.UserRole;
 import br.com.alura.AluraFake.user.model.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,7 +77,7 @@ public class TaskServiceTest {
     }
 
     private static User getValidInstructor() {
-        return new User("Eduardo", "eduardo@alura.com.br", Role.INSTRUCTOR);
+        return new User("Eduardo", "eduardo@alura.com.br", UserRole.INSTRUCTOR);
     }
     
     @Test
@@ -111,7 +111,7 @@ public class TaskServiceTest {
     void newOpenTextExercise__should_throw_duplicate_task_statement_in_exception_when_statement_is_duplicated_by_course_id() {
         NewOpenTextTaskDTO newOpenTextTaskDTO = getValidNewOpenTextTaskDTO();
 
-        when(courseRepository.findById(newOpenTextTaskDTO.getCourseId())).thenReturn(Optional.of(getValidCourse()));;
+        when(courseRepository.findById(newOpenTextTaskDTO.getCourseId())).thenReturn(Optional.of(getValidCourse()));
         when(taskRepository.existsTasksByCourseIdAndByStatement(
                 newOpenTextTaskDTO.getCourseId(),
                 newOpenTextTaskDTO.getStatement()
@@ -204,7 +204,7 @@ public class TaskServiceTest {
     void newOpenTextExercise__should_save_task_when_dto_is_valid() {
         NewOpenTextTaskDTO newOpenTextTaskDTO = getValidNewOpenTextTaskDTO();
 
-        when(courseRepository.findById(newOpenTextTaskDTO.getCourseId())).thenReturn(Optional.of(getValidCourse()));;
+        when(courseRepository.findById(newOpenTextTaskDTO.getCourseId())).thenReturn(Optional.of(getValidCourse()));
         doReturn(null).when(taskRepository).findHighestOrderByCourseId(newOpenTextTaskDTO.getCourseId());
         taskService.newOpenTextExercise(newOpenTextTaskDTO);
 

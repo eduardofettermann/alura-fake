@@ -3,7 +3,7 @@ package br.com.alura.AluraFake.user;
 import br.com.alura.AluraFake.exception.domain.DuplicateUserEmailException;
 import br.com.alura.AluraFake.user.dto.NewUserDTO;
 import br.com.alura.AluraFake.user.dto.UserListItemDTO;
-import br.com.alura.AluraFake.user.model.Role;
+import br.com.alura.AluraFake.user.model.UserRole;
 import br.com.alura.AluraFake.user.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,8 +31,8 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        newUserDTO = new NewUserDTO("John Doe", "john.doe@example.com", Role.STUDENT, null);
-        user = new User("John Doe", "john.doe@example.com", Role.STUDENT);
+        newUserDTO = new NewUserDTO("John Doe", "john.doe@example.com", UserRole.STUDENT, null);
+        user = new User("John Doe", "john.doe@example.com", UserRole.STUDENT);
     }
 
     @Test
@@ -61,8 +61,8 @@ public class UserServiceTest {
 
     @Test
     void listAllUsers__should_return_list_of_user_list_item_dtos() {
-        User user1 = new User("John Doe", "john.doe@example.com", Role.STUDENT);
-        User user2 = new User("Jane Doe", "jane.doe@example.com", Role.STUDENT);
+        User user1 = new User("John Doe", "john.doe@example.com", UserRole.STUDENT);
+        User user2 = new User("Jane Doe", "jane.doe@example.com", UserRole.STUDENT);
         when(userRepository.findAll()).thenReturn(List.of(user1, user2));
 
         List<UserListItemDTO> result = userService.listAllUsers();

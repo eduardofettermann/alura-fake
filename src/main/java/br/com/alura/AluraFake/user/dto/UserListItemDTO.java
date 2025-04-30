@@ -1,6 +1,6 @@
 package br.com.alura.AluraFake.user.dto;
 
-import br.com.alura.AluraFake.user.model.Role;
+import br.com.alura.AluraFake.user.model.UserRole;
 import br.com.alura.AluraFake.user.model.User;
 
 import java.io.Serializable;
@@ -8,7 +8,7 @@ import java.io.Serializable;
 public record UserListItemDTO(
         String name,
         String email,
-        Role role
+        UserRole role
 ) implements Serializable {
 
     public UserListItemDTO(User user) {

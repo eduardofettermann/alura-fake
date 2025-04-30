@@ -1,6 +1,6 @@
 package br.com.alura.AluraFake.user.dto;
 
-import br.com.alura.AluraFake.user.model.Role;
+import br.com.alura.AluraFake.user.model.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,7 +12,7 @@ public record UserRegisterDTO(
         @Email
         String email,
         @NotNull
-        Role role,
+        UserRole role,
         @NotNull
         String password
 ) {

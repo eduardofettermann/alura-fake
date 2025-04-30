@@ -2,12 +2,17 @@ package br.com.alura.AluraFake.alternative.model;
 
 import br.com.alura.AluraFake.task.model.Task;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor
 public class Alternative {
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Getter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_id", referencedColumnName = "id", nullable = false)
     private Task task;
@@ -20,21 +25,6 @@ public class Alternative {
         this.task = task;
         this.option = option;
         this.isCorrect = isCorrect;
-    }
-
-    @Deprecated
-    public Alternative() {}
-
-    public Long getId() {
-        return id;
-    }
-
-    public Task getTask() {
-        return task;
-    }
-
-    public String getOption() {
-        return option;
     }
 
     public Boolean isCorrect() {
