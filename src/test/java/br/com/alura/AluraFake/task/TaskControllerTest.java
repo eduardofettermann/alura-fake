@@ -1,17 +1,25 @@
 package br.com.alura.AluraFake.task;
 
+import br.com.alura.AluraFake.AluraFakeApplication;
 import br.com.alura.AluraFake.alternative.dto.NewAlternativeDTO;
 import br.com.alura.AluraFake.exception.domain.*;
+import br.com.alura.AluraFake.infra.security.SecurityConfiguration;
+import br.com.alura.AluraFake.infra.security.TokenService;
 import br.com.alura.AluraFake.task.dto.NewMultipleChoiceTaskDTO;
 import br.com.alura.AluraFake.task.dto.NewOpenTextTaskDTO;
 import br.com.alura.AluraFake.task.dto.NewSingleChoiceTaskDTO;
 import br.com.alura.AluraFake.task.dto.TaskListItemDTO;
+import br.com.alura.AluraFake.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -23,6 +31,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ExtendWith(value = SpringExtension.class)
+@ContextConfiguration(classes = {
+        AluraFakeApplication.class,
+        SecurityConfiguration.class}
+)
 @WebMvcTest(TaskController.class)
 class TaskControllerTest {
 
@@ -31,6 +44,12 @@ class TaskControllerTest {
 
     @MockBean
     private TaskService taskService;
+
+    @MockBean
+    private TokenService tokenService;
+
+    @MockBean
+    private UserRepository userRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -72,7 +91,7 @@ class TaskControllerTest {
 
         return newMultipleChoiceTaskDTO;
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void createOpenTextTask_should_return_unprocessable_entity_when_course_not_found() throws Exception {
         NewOpenTextTaskDTO newOpenTextTaskDTO = getValidNewOpenTextTaskDTO();
@@ -86,7 +105,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.field").value("courseId"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newOpenTextExercise__should_return_unprocessable_entity_when_statement_is_duplicated_by_course_id() throws Exception {
         NewOpenTextTaskDTO newOpenTextTaskDTO = getValidNewOpenTextTaskDTO();
@@ -107,7 +126,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.message")
                         .isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newOpenTextExercise__should_return_unprocessable_entity_when_course_is_not_building() throws Exception {
         NewOpenTextTaskDTO newOpenTextTaskDTO = getValidNewOpenTextTaskDTO();
@@ -124,7 +143,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.message")
                         .isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newOpenTextExercise__should_return_unprocessable_entity_when_order_is_out_of_sequence() throws Exception {
         NewOpenTextTaskDTO newOpenTextTaskDTO = getValidNewOpenTextTaskDTO();
@@ -142,7 +161,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.message")
                         .isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newOpenTextExercise_should_return_created_when_valid() throws Exception {
         NewOpenTextTaskDTO newOpenTextTaskDTO = getValidNewOpenTextTaskDTO();
@@ -154,7 +173,7 @@ class TaskControllerTest {
                         .content(objectMapper.writeValueAsString(newOpenTextTaskDTO)))
                 .andExpect(status().isCreated());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newSingleChoice_should_return_unprocessable_entity_when_course_not_found() throws Exception {
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = getValidNewSingleChoiceTaskDTO();
@@ -169,7 +188,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.field").value("courseId"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newSingleChoice__should_return_unprocessable_entity_when_statement_is_duplicated_by_course_id() throws Exception {
         NewSingleChoiceTaskDTO invalidTask = getValidNewSingleChoiceTaskDTO();
@@ -190,7 +209,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.message")
                         .isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newSingleChoice__should_return_unprocessable_entity_when_course_is_not_building() throws Exception {
         NewSingleChoiceTaskDTO taskNotInBuilding = getValidNewSingleChoiceTaskDTO();
@@ -207,7 +226,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.message")
                         .isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newSingleChoice__should_return_unprocessable_entity_when_order_is_out_of_sequence() throws Exception {
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = getValidNewSingleChoiceTaskDTO();
@@ -224,7 +243,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.message")
                         .isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newSingleChoice_should_return_unprocessable_entity_when_options_invalid() throws Exception {
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = getValidNewSingleChoiceTaskDTO();
@@ -241,7 +260,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.field").value("options"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newSingleChoice_should_return_unprocessable_entity_when_duplicate_options() throws Exception {
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = getValidNewSingleChoiceTaskDTO();
@@ -256,7 +275,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.field").value("options"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newSingleChoice_should_return_created_when_valid() throws Exception {
         NewSingleChoiceTaskDTO newSingleChoiceTaskDTO = getValidNewSingleChoiceTaskDTO();
@@ -268,7 +287,7 @@ class TaskControllerTest {
 
         verify(taskService, times(1)).newSingleChoice(any(NewSingleChoiceTaskDTO.class));
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newMultipleChoice_should_return_unprocessable_entity_when_course_not_found() throws Exception {
         NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO = getValidNewMultipleChoiceTaskDTO();
@@ -283,7 +302,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.field").value("courseId"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newMultipleChoice__should_return_unprocessable_entity_when_statement_is_duplicated_by_course_id() throws Exception {
         NewMultipleChoiceTaskDTO invalidTask = getValidNewMultipleChoiceTaskDTO();
@@ -304,7 +323,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.message")
                         .isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newMultipleChoice__should_return_unprocessable_entity_when_course_is_not_building() throws Exception {
         NewMultipleChoiceTaskDTO taskNotInBuilding = getValidNewMultipleChoiceTaskDTO();
@@ -321,7 +340,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.message")
                         .isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newMultipleChoice__should_return_unprocessable_entity_when_order_is_out_of_sequence() throws Exception {
         NewMultipleChoiceTaskDTO newMultipleChoiceTaskDTO = getValidNewMultipleChoiceTaskDTO();
@@ -337,7 +356,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.message")
                         .isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newMultipleChoice__should_return_unprocessable_entity_when_options_invalid() throws Exception {
         NewMultipleChoiceTaskDTO taskDTO = getValidNewMultipleChoiceTaskDTO();
@@ -354,7 +373,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.field").value("options"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void newMultipleChoice_should_return_created_when_valid() throws Exception {
         NewMultipleChoiceTaskDTO taskDTO = getValidNewMultipleChoiceTaskDTO();
@@ -366,7 +385,7 @@ class TaskControllerTest {
 
         verify(taskService, times(1)).newMultipleChoice(any(NewMultipleChoiceTaskDTO.class));
     }
-
+    @WithMockUser(username = "instructor", roles = {"INSTRUCTOR"})
     @Test
     void listAllTasks_should_return_task_list() throws Exception {
         TaskListItemDTO yagniTask = new TaskListItemDTO(1L, "Explique o que é YAGNI e as vantagens da sua utilização.", 1);
