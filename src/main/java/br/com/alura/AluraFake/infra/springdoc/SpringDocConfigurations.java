@@ -22,7 +22,7 @@ public class SpringDocConfigurations {
                                         .bearerFormat("JWT")))
                 .info(new Info()
                         .title("AluraFake API")
-                        .description("API REST da aplicação AluraFake, contendo funcionalidades de CRUD de usuários, cursos e tarefas")
+                        .description("API REST do Case técnico para a vaga de Dev Java na Alura")
                         .contact(new Contact()
                                 .name("Eduardo Fettermann")
                                 .email("eduardofettermann212@gmail.com")));
