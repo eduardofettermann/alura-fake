@@ -2,6 +2,7 @@ package br.com.alura.AluraFake.task.dto;
 
 import br.com.alura.AluraFake.alternative.dto.NewAlternativeDTO;
 import br.com.alura.AluraFake.task.model.TaskType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -9,6 +10,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public class NewMultipleChoiceTaskDTO extends NewTaskDTO {
+    @Schema(description = "Lista de alternativas para a questão")
     @NotNull
     @Size(min = 3, max = 5, message = "The list must have between 3 and 5 alternatives")
     @Valid
